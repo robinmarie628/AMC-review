@@ -1,1 +1,46 @@
-[]
+[
+  {
+    "id": "ai_paeds_001",
+    "cat": "paeds",
+    "title": "儿科-阴道出血",
+    "stem": "Concerned mother of a 6-year-old girl has brought her to your attention because she has frequently noticed blood-stained yellow discharge on her panties. She is otherwise healthy. There is no complaint of itching or urinary symptoms. The girl lives with her mother and birth father. On examination, the vitals are within normal ranges. On inspection, there is mild erythema of the vulva and perianal area and offensive blood-stained yellow discharge in the introitus. Which one of the following could be the most likely diagnosis?",
+    "options": {
+      "A": "Monilial vulvovaginitis",
+      "B": "Vaginal foreign body",
+      "C": "Atrophic vulvovaginitis",
+      "D": "Chlamydia infection",
+      "E": "Threadworms"
+    },
+    "answer": "B",
+    "summary": "【核心诊断】学龄女童血性恶臭阴道分泌物，无瘙痒、无泌尿症状 = 阴道异物\n\n【鉴别要点】\n• 念珠菌：瘙痒+白色分泌物，非血性\n• 萎缩性阴道炎：绝经后女性，儿童不可能\n• 衣原体：性虐待警示，分泌物不臭不血\n• 蛲虫：夜间肛周瘙痒，不引起血性分泌物\n\n【陷阱】看到血性分泌物易联想性虐待或感染，但「恶臭+血性+无瘙痒」是阴道异物经典三联征\n\n【处理】外阴检查 → 麻醉下阴道镜 → 取出异物 → 必要时送培养"
+  },
+  {
+    "id": "ai_paeds_002",
+    "cat": "paeds",
+    "title": "儿科-甲状腺舌管囊肿",
+    "stem": "A 6-year-old girl is brought to your general practice by her mother, who is concerned about a neck mass in her daughter. The mass is shown in the following photograph. The child is otherwise healthy. On examination, there is a non-tender neck mass in the midline moving with swallowing and tongue protrusion. The rest of the physical examination is unremarkable. Which one of the following could be the most likely complication of this neck mass?",
+    "options": {
+      "A": "Infection",
+      "B": "Malignancy",
+      "C": "Fistula formation",
+      "D": "Overgrowth and compression of underlying structures",
+      "E": "Rupture"
+    },
+    "answer": "A",
+    "summary": "【核心诊断】颈部正中、无痛性肿块，随吞咽和伸舌移动 = 甲状腺舌管囊肿（thyroglossal cyst）\n\n【最常见并发症】感染（继发细菌感染形成脓肿）\n\n【治疗】Sistrunk 手术：切除囊肿 + 舌骨中段 + 瘘管全程，复发率低\n\n【鉴别要点】\n• 甲状腺肿块：随吞咽移动，但不随伸舌移动\n• 鳃裂囊肿：位于侧颈部，不随吞咽移动\n• 淋巴结炎：常有压痛、近期上呼吸道感染史\n• 皮样囊肿：不随吞咽/伸舌移动\n\n【陷阱】看到颈部肿块容易先想到淋巴结或甲状腺问题，但「正中 + 随吞咽 + 随伸舌」是甲状腺舌管囊肿的三联特征"
+  },
+  {
+    "id": "ai_paeds_003",
+    "cat": "paeds",
+    "title": "儿科-蛋白尿评估",
+    "stem": "An 8-year-old boy is found to have persistent proteinuria of 2+ on dipstick urine. There is no hematuria. Physical examination including blood pressure is unremarkable. Which one of the following is the next best investigation to consider for this boy?",
+    "options": {
+      "A": "Renal biopsy",
+      "B": "12-hour urine protein",
+      "C": "Urine examination",
+      "D": "C3 and C4 level measurement",
+      "E": "Ultrasonography"
+    },
+    "answer": "C",
+    "summary": "【核心诊断】孤立性持续性蛋白尿，无血尿、血压正常 → 先完善尿液检查\n\n【下一步最佳检查】完整尿检（urinalysis）\n• 确认蛋白尿：间隔1-2天
+
