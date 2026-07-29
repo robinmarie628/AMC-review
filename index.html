@@ -952,7 +952,9 @@ function getAllQuestions(){
       stem: q.stem,
       options: q.options || {},
       answer: q.answer || '',
-      explanation: (q.title||'') + '\n' + (q.summary||'')
+      explanation: (q.title||'') + '\n' + (q.summary||''),
+      innerNote: q.innerNote || null,
+      imageBase64: q.imageBase64 || null
     });
   });
   // 错题本中手动/AI录入的题目（localStorage）
@@ -967,7 +969,9 @@ function getAllQuestions(){
         stem: w.stem,
         options: w.options || {},
         answer: w.answer || '',
-        explanation: (w.title||'') + '\n' + (w.summary||'')
+        explanation: (w.title||'') + '\n' + (w.summary||''),
+        innerNote: w.innerNote || null,
+        imageBase64: w.imageBase64 || null
       });
     }
   });
