@@ -192,6 +192,7 @@ body{
 /* ai zone */
 .ai-zone{background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:14px}
 .note{background:var(--warn-soft);border:1px solid #fde68a;color:#92400e;padding:10px 12px;border-radius:8px;font-size:13px;margin:12px 0}
+.note code{background:rgba(255,255,255,.6);padding:1px 5px;border-radius:3px;font-size:12px}
 /* finish */
 .finish-ic{font-size:48px;text-align:center;margin:10px 0}
 .finish-tx{text-align:center;font-size:18px;font-weight:700;margin-bottom:6px}
@@ -232,7 +233,7 @@ body{
     </div>
     <div class="quick">
       <a href="#" data-go="practice"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>练习</div><div class="d">按科目或随机做题</div></a>
-      <a href="#" data-go="input"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>录入</div><div class="d">拍照/粘贴错题</div></a>
+      <a href="#" data-go="input"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>录入</div><div class="d">JSON / 截图录入</div></a>
       <a href="#" data-go="wrong"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>错题本</div><div class="d">复盘薄弱知识点</div></a>
     </div>
     <div class="card">
@@ -288,14 +289,67 @@ body{
       <div id="ai-import-msg" style="margin-top:10px;display:none"></div>
     </div>
 
-    <!-- 云端同步 -->
+    <!-- 永久存储：嵌入到 HTML -->
     <div class="card">
-      <div class="section-title">☁️ 云端同步</div>
-      <p class="muted">一键从远程拉取 WorkBuddy 分析好的错题，自动合并到本地错题本</p>
-      <div class="actions" style="margin-top:10px">
-        <button class="btn btn-pri" id="sync-btn">立即同步</button>
-        <span class="muted" id="sync-status" style="margin-left:8px;display:none"></span>
+      <div class="section-title">📦 永久存储错题</div>
+      <p class="muted">导入的错题<strong>自动嵌入</strong>，立即可用。可选配置 GitHub 自动推送（一次设置，之后每次粘贴 JSON 都自动同步到全设备）。</p>
+      <div class="note" style="margin-top:10px">
+        <strong>三条路：</strong>
+        <br>① <strong>GitHub 自动同步</strong>（推荐）：配置一次，永久全自动 →
+        <br>② <strong>下载 HTML</strong>：下载新文件后手动替换（电脑端体验最佳）
+        <br>③ <strong>复制代码</strong>：把 JS 代码贴进源文件（如果习惯编辑代码）
       </div>
+
+      <!-- GitHub 自动同步配置（折叠） -->
+      <details id="gh-details" style="margin-top:14px">
+        <summary style="cursor:pointer;font-weight:600;color:var(--brand-dark);font-size:14px">☁️ 配置 GitHub 自动同步（一次设置，之后全自动）</summary>
+        <div style="margin-top:12px;font-size:13px">
+          <div class="form-group" style="margin-bottom:10px">
+            <label style="font-size:13px">Personal Access Token <span class="muted" style="font-weight:normal">(仅本机保存，不上传)</span></label>
+            <input type="password" id="gh-token" class="input" placeholder="ghp_xxxxxxxxxxxx" style="font-family:monospace;font-size:13px">
+            <div class="muted" style="font-size:11px;margin-top:4px;line-height:1.5">
+              获取步骤：GitHub 头像 → <strong>Settings</strong> → <strong>Developer settings</strong> → <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong> → <strong>Generate new token</strong> → 勾选 <code>repo</code> → 生成 → 复制 token
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:10px">
+            <label style="font-size:13px">仓库</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <input class="input" id="gh-owner" placeholder="owner" value="robinmarie628" style="flex:1">
+              <span style="color:var(--muted)">/</span>
+              <input class="input" id="gh-repo" placeholder="repo" value="AMC-review" style="flex:1">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:10px">
+            <label style="font-size:13px">分支</label>
+            <input class="input" id="gh-branch" value="main">
+          </div>
+          <div class="actions" style="margin-top:10px">
+            <button class="btn btn-pri btn-sm" id="gh-save">保存配置</button>
+            <button class="btn btn-ghost btn-sm" id="gh-test">测试连接</button>
+            <button class="btn btn-ghost btn-sm" id="gh-clear" style="margin-left:auto;color:var(--err)">清除</button>
+          </div>
+        </div>
+      </details>
+
+      <!-- 配置成功的状态条 -->
+      <div id="gh-status" style="margin-top:14px;padding:10px 12px;background:var(--ok-soft);border-radius:8px;display:none;font-size:13px">
+        <div><b style="color:var(--ok)">✓ 已连接：</b><span id="gh-status-text"></span></div>
+        <label style="margin-top:6px;display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="gh-auto" style="margin:0"> <span>导入错题后自动推送到 GitHub（推荐开启）</span>
+        </label>
+      </div>
+
+      <div style="margin-top:14px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">已嵌入 <span id="embed-count">0</span> 题</div>
+        <textarea class="textarea" id="embed-code" style="min-height:100px;font-family:monospace;font-size:12px" readonly placeholder="// 嵌入的题目会显示在这里（只读）"></textarea>
+      </div>
+
+      <div class="actions" style="margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-pri" id="gh-push" style="display:none">☁️ 立即推送到 GitHub</button>
+        <button class="btn btn-ghost" id="embed-download">💾 下载新版 HTML</button>
+        <button class="btn btn-ghost btn-sm" id="embed-copy">📋 复制代码</button>
+      </div>
+      <div id="embed-msg" style="margin-top:10px;display:none"></div>
     </div>
   </div>
 
@@ -354,8 +408,8 @@ body{
 
       <h2>使用方法</h2>
       <ul>
-        <li><strong>录入错题：</strong>截图/拍照 → "录入"页粘贴 → 填写要点 → 保存</li>
-        <li><strong>AI 录入：</strong>通过 WorkBuddy 分享截图给我，我自动识别并生成要点</li>
+        <li><strong>录入错题：</strong>"录入"页粘贴 JSON 或截图</li>
+        <li><strong>永久保存错题：</strong>导入后用"📋 复制嵌入代码"把代码嵌入 HTML 文件本身</li>
         <li><strong>练习：</strong>顶部"练习" → 选科目或"全部随机"</li>
         <li><strong>错题本：</strong>查看要点总结、重做错题、移除已掌握的</li>
         <li><strong>统计：</strong>各科目正确率，发现薄弱项</li>
@@ -390,6 +444,55 @@ const QUESTIONS = [
   {id:'ex006',category:'phe',stem:'一项筛查试验的敏感度90%、特异度95%。某病人群患病率1%。一个无症状者筛查阳性，其真正患病的概率（阳性预测值）约为？',options:{A:'约90%',B:'约15%',C:'约95%',D:'约50%',E:'约1%'},answer:'B',explanation:'低患病率下PPV远低于敏感度。1%患病率×90%敏感度=9真阳/(9真阳+495假阳≈95.1%)，PPV≈9/504≈15%。'},
 ];
 
+/* ============ 原始 HTML 源（用于下载功能）============
+   必须在最早期执行，捕获还未被 JS 修改之前的完整 HTML 文件。
+   "下载更新版 HTML"功能依靠这个源生成新文件。*/
+const FILE_SOURCE = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+/* ============ 永久嵌入题库 ============
+   粘贴 JSON 导入的错题会自动加到这里，立即可用。
+   也可以手动在文件中添加题目（无需编程，每次都是手动改文件）。
+   字段说明：
+     id      - 必填，唯一标识（程序会自动用内容 hash 生成）
+     cat     - 必填，分类 key (medicine/surgery/og/paeds/psych/phe)
+     title   - 选填，标题
+     stem    - 必填，题干
+     options - 选填，选项 {A:'...', B:'...'}
+     answer  - 选填，正确答案字母
+     summary - 选填，要点总结
+     imageBase64 - 选填，截图（base64 编码）
+*/
+let EMBEDDED_QUESTIONS = [
+  // 示例（可删除）：
+  // {id:'embed_demo', cat:'medicine', title:'示例', stem:'题干', options:{A:'选项A',B:'选项B'}, answer:'A', summary:'要点总结'},
+];
+
+/* ============ 本地缓存：影子备份 ============
+   为了避免误刷新浏览器丢失数据，把 EMBEDDED_QUESTIONS 也存到 localStorage。
+   下载新版 HTML 后可清除。下载后这些数据也会被烘进文件里，不会有冲突。*/
+const EMBEDDED_SHADOW_KEY = 'amc_review_embedded_v1';
+function loadEmbeddedShadow(){
+  try { return JSON.parse(localStorage.getItem(EMBEDDED_SHADOW_KEY)) || []; }
+  catch(e) { return []; }
+}
+function saveEmbeddedShadow(){
+  try { localStorage.setItem(EMBEDDED_SHADOW_KEY, JSON.stringify(EMBEDDED_QUESTIONS)); }
+  catch(e) { /* localStorage 可能被禁用，不致命 */ }
+}
+
+// 启动时合并影子到运行时嵌入数组（按 id 去重）
+(function initEmbedded(){
+  const shadow = loadEmbeddedShadow();
+  const ids = new Set(EMBEDDED_QUESTIONS.map(q => q.id).filter(Boolean));
+  shadow.forEach(q => {
+    if(q && q.id && !ids.has(q.id)){
+      EMBEDDED_QUESTIONS.push(q);
+      ids.add(q.id);
+    }
+  });
+  saveEmbeddedShadow();
+})();
+
 /* ============ 持久化 ============ */
 const STORE_KEY='amc_review_v2';
 function loadStore(){
@@ -397,7 +500,7 @@ function loadStore(){
 }
 function saveStore(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
 let store = loadStore();
-// store: { stats:{perQ:{}, perCat:{}}, wrong:{qId:{wrongCount,lastAns,addedAt,marked,summary,imageBase64,source,cat,stem,options,answer}}, customWrong:{} }
+// store: { stats:{perQ:{}, perCat:{}}, wrong:{qId:{wrongCount,lastAns,addedAt,marked,summary,imageBase64,source,cat,stem,options,answer}} }
 
 function ensureStore(){
   store.stats = store.stats || {perQ:{}, perCat:{}};
@@ -437,6 +540,35 @@ function removeWrong(qId){
 
 function totalSeen(){ let s=0; for(const k in store.stats.perQ) s+=store.stats.perQ[k].seen; return s; }
 function totalCorrect(){ let s=0; for(const k in store.stats.perQ) s+=store.stats.perQ[k].correct; return s; }
+
+/* ============ 嵌入错题相关 ============ */
+// 生成可粘贴到 HTML 的 JS 代码（基于当前 EMBEDDED_QUESTIONS）
+function generateEmbedCode(){
+  if(!EMBEDDED_QUESTIONS.length){
+    return '// 当前还没有嵌入错题。\n// 在"AI 一键导入"粘贴 JSON 即可自动加入。';
+  }
+  return EMBEDDED_QUESTIONS.map(item => {
+    const obj = {
+      id: item.id,
+      cat: item.cat,
+      stem: item.stem,
+    };
+    if(item.title) obj.title = item.title;
+    if(item.options) obj.options = item.options;
+    if(item.answer) obj.answer = item.answer;
+    if(item.summary) obj.summary = item.summary;
+    if(item.imageBase64) obj.imageBase64 = item.imageBase64;
+    return `EMBEDDED_QUESTIONS.push(${JSON.stringify(obj, null, 2)});`;
+  }).join('\n\n');
+}
+
+// 渲染嵌入区域
+function renderEmbedSection(){
+  const countEl = document.getElementById('embed-count');
+  const codeEl = document.getElementById('embed-code');
+  if(countEl) countEl.textContent = EMBEDDED_QUESTIONS.length;
+  if(codeEl) codeEl.value = generateEmbedCode();
+}
 
 /* ============ 导航 ============ */
 function go(name){
@@ -497,7 +629,7 @@ document.getElementById('pr-quit').addEventListener('click', ()=>{ if(confirm('�
 
 function startSession(catKey, btn){
   let pool;
-  // 合并内置题库 + 错题本中的自定义题目
+  // 合并内置题库 + 嵌入题库 + 错题本中的自定义题目
   const allQuestions = getAllQuestions();
   if(catKey==='all') pool=allQuestions.slice();
   else pool=allQuestions.filter(q=>q.category===catKey);
@@ -510,12 +642,29 @@ function startSession(catKey, btn){
   renderQuestion();
 }
 
-// 合并内置题库和错题本中的自定义题目
+// 合并内置题库、嵌入题库和错题本中的自定义题目
 function getAllQuestions(){
   const pool = QUESTIONS.slice().map(q=>({...q}));
-  // 把错题本中手动/AI录入的题目加入题库
+  // 嵌入到 HTML 的题目（永久存储）
+  EMBEDDED_QUESTIONS.forEach(q => {
+    if(!q.id || !q.stem || !q.cat) return;
+    // 避免与内置题库重复
+    if(QUESTIONS.find(x => x.id === q.id)) return;
+    pool.push({
+      id: q.id,
+      category: q.cat,
+      title: q.title || null,
+      stem: q.stem,
+      options: q.options || {},
+      answer: q.answer || '',
+      explanation: (q.title||'') + '\n' + (q.summary||'')
+    });
+  });
+  // 错题本中手动/AI录入的题目（localStorage）
   Object.entries(store.wrong).forEach(([id, w])=>{
-    if(!QUESTIONS.find(q=>q.id===id) && w.stem && w.cat){
+    if(QUESTIONS.find(q=>q.id===id)) return;
+    if(EMBEDDED_QUESTIONS.find(q=>q.id===id)) return;
+    if(w.stem && w.cat){
       pool.push({
         id: id,
         category: w.cat,
@@ -617,7 +766,7 @@ function renderInputPage(){
   if(preview){ preview.style.display='none'; }
   document.getElementById('ai-batch').value = '';
   document.getElementById('ai-import-msg').style.display='none';
-  document.getElementById('sync-status').style.display = 'none';
+  renderEmbedSection();
 }
 
 // 粘贴事件
@@ -683,85 +832,370 @@ document.getElementById('ai-import').addEventListener('click', function(){
     msg.innerHTML='<div class="feedback show err"><div class="h">JSON 解析失败</div>请检查格式是否完整，注意引号和逗号。</div>';
     return;
   }
-  let count=0, errors=[];
+  const existingIds = new Set(EMBEDDED_QUESTIONS.map(q => q.id).filter(Boolean));
+  let count=0, skipped=0, errors=[];
   list.forEach((item, idx)=>{
-    if(!item.cat || !item.stem || !item.summary){
-      errors.push(`第 ${idx+1} 题缺少 cat/stem/summary`);
+    if(!item.cat || !item.stem){
+      errors.push(`第 ${idx+1} 题缺少 cat/stem`);
       return;
     }
-    const id = 'ai_' + Date.now() + '_' + idx;
-    store.wrong[id] = {
-      wrongCount: 1,
-      addedAt: Date.now(),
-      cat: item.cat,
-      title: item.title || item.stem.substring(0, 25),
-      stem: item.stem,
-      options: item.options || null,
-      answer: item.answer || null,
-      summary: item.summary,
-      imageBase64: item.imageBase64 || null,
-      source: 'ai'
+    // 用内容生成稳定 id（同一题再次导入不会重复）
+    const contentKey = (item.stem || '') + '|' + JSON.stringify(item.options||{}) + '|' + (item.answer||'') + '|' + (item.summary||'');
+    const id = 'embed_' + simpleHash(contentKey);
+    // 已存在则跳过（避免重复）
+    if(existingIds.has(id)){ skipped++; return; }
+    // 直接加入运行时嵌入数组，立即可用
+    const eq = {
+      id, cat: item.cat, stem: item.stem,
     };
+    if(item.title) eq.title = item.title;
+    else eq.title = (item.stem||'').substring(0, 25);
+    if(item.options) eq.options = item.options;
+    if(item.answer !== undefined && item.answer !== null) eq.answer = item.answer;
+    if(item.summary) eq.summary = item.summary;
+    if(item.imageBase64) eq.imageBase64 = item.imageBase64;
+    EMBEDDED_QUESTIONS.push(eq);
+    existingIds.add(id);
     count++;
   });
-  saveStore(store);
+  saveEmbeddedShadow();  // 写入 localStorage，防止意外刷新丢失
+  renderEmbedSection();
   msg.style.display='block';
   if(errors.length){
-    msg.innerHTML=`<div class="feedback show ${count>0?'ok':'err'}"><div class="h">${count>0?'已导入 '+count+' 题':'导入失败'}</div>${errors.map(e=>`<div>• ${e}</div>`).join('')}</div>`;
+    msg.innerHTML=`<div class="feedback show ${count>0?'ok':'err'}"><div class="h">${count>0?'已嵌入 '+count+' 题':'导入失败'}</div>${errors.map(e=>`<div>• ${e}</div>`).join('')}</div>`;
   } else {
-    msg.innerHTML=`<div class="feedback show ok"><div class="h">✓ 成功导入 ${count} 题</div><a href="#" style="color:var(--brand-dark);font-weight:600;font-size:13px" onclick="go('wrong');return false">去错题本查看 →</a></div>`;
+    msg.innerHTML=`<div class="feedback show ok"><div class="h">✓ 已嵌入 ${count} 题${skipped>0?'（跳过 '+skipped+' 题已存在）':''}</div>
+      题目立刻在"练习"和"错题本"可用。<br>
+      <a href="#" style="color:var(--brand-dark);font-weight:600;font-size:13px" onclick="go('wrong');return false">去错题本查看 →</a><br>
+      ${ghAutoPush && ghConfig.token ? '正在自动推送到 GitHub...' : '<a href="#embed-download" style="color:var(--accent);font-weight:600;font-size:13px" onclick="document.getElementById(\'embed-download\').scrollIntoView({behavior:\'smooth\'});return false">💾 下载新版 HTML 永久保存 →</a>'}</div>`;
     document.getElementById('ai-batch').value = '';
   }
+  // 自动推送（如开启）
+  if(count > 0){ maybeAutoPush(); }
 });
 document.getElementById('ai-import-clear').addEventListener('click', function(){
   document.getElementById('ai-batch').value = '';
   document.getElementById('ai-import-msg').style.display='none';
 });
 
-// 云端同步
-document.getElementById('sync-btn').addEventListener('click', function(){
-  const status = document.getElementById('sync-status');
-  status.style.display='inline';
-  status.textContent = '同步中...';
-  status.style.color = 'var(--muted)';
+// 简单稳定 hash（用于内容寻址 id）
+function simpleHash(s){
+  let h = 0;
+  for(let i=0; i<s.length; i++){
+    h = ((h << 5) - h) + s.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h).toString(36);
+}
 
-  // 自动使用同域名下的 wrong-questions.json，避免跨域
-  const url = './wrong-questions.json';
-
-  fetch(url)
-    .then(r => {
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      return r.json();
-    })
-    .then(data => {
-      if(!Array.isArray(data)) throw new Error('格式错误');
-      let added = 0, skipped = 0;
-      data.forEach(item => {
-        if(!item.id || !item.cat || !item.stem) return;
-        if(store.wrong[item.id]){ skipped++; return; }
-        store.wrong[item.id] = {
-          wrongCount: 1,
-          addedAt: Date.now(),
-          cat: item.cat,
-          title: item.title || null,
-          stem: item.stem,
-          options: item.options || null,
-          answer: item.answer || null,
-          summary: item.summary || '',
-          imageBase64: item.imageBase64 || null,
-          source: 'ai'
-        };
-        added++;
-      });
-      saveStore(store);
-      status.textContent = '✓ 新增 '+added+' 题'+(skipped>0?'，跳过 '+skipped+' 题（已存在）':'');
-      status.style.color = 'var(--ok)';
-    })
-    .catch(err => {
-      status.textContent = '✗ 同步失败: '+err.message;
-      status.style.color = 'var(--err)';
-    });
+// 复制嵌入代码
+document.getElementById('embed-copy').addEventListener('click', async function(){
+  const code = document.getElementById('embed-code').value;
+  const msg = document.getElementById('embed-msg');
+  if(!code || code.startsWith('// 当前没有')){
+    msg.style.display='block';
+    msg.innerHTML='<div class="feedback show err"><div class="h">没有可复制的代码</div>请先在"AI 一键导入"导入错题。</div>';
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(code);
+    msg.style.display='block';
+    msg.innerHTML='<div class="feedback show ok"><div class="h">✓ 已复制到剪贴板</div>打开本 HTML 文件，把代码粘贴到 <code>EMBEDDED_QUESTIONS = []</code> 数组里、保存即可永久保存。</div>';
+  }catch(e){
+    // 降级：选中让用户手动复制
+    const ta = document.getElementById('embed-code');
+    ta.removeAttribute('readonly');
+    ta.select();
+    try{ document.execCommand('copy'); }catch(_){}
+    msg.style.display='block';
+    msg.innerHTML='<div class="feedback show ok"><div class="h">✓ 已选中代码</div>按 Ctrl/⌘+C 复制，然后粘贴到 HTML 文件的 <code>EMBEDDED_QUESTIONS = []</code> 数组里。</div>';
+  }
 });
+
+/* ============ 下载更新版 HTML ============ */
+// 把当前 EMBEDDED_QUESTIONS 序列化为 JS 数组字面量
+function serializeEmbeddedQuestions(){
+  if(!EMBEDDED_QUESTIONS.length) return '[]';
+  return '[\n' + EMBEDDED_QUESTIONS.map(q => '  ' + JSON.stringify(q)).join(',\n') + '\n]';
+}
+
+// 用 FILE_SOURCE 作为模板，把 EMBEDDED_QUESTIONS 声明替换为当前值
+function buildUpdatedHTML(){
+  const literal = serializeEmbeddedQuestions();
+  return FILE_SOURCE.replace(
+    /(let|const)\s+EMBEDDED_QUESTIONS\s*=\s*\[[\s\S]*?\];/,
+    `let EMBEDDED_QUESTIONS = ${literal};`
+  );
+}
+
+// 检测 iPhone/iPad Safari
+function isIOSSafari(){
+  const ua = navigator.userAgent;
+  return /iPad|iPhone|iPod/.test(ua) && /WebKit/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+}
+
+async function downloadUpdatedHTML(){
+  const msg = document.getElementById('embed-msg');
+  if(!EMBEDDED_QUESTIONS.length){
+    msg.style.display='block';
+    msg.innerHTML='<div class="feedback show err"><div class="h">还没有嵌入任何错题</div>先在"AI 一键导入"粘贴 JSON 导入题目。</div>';
+    return;
+  }
+  const html = buildUpdatedHTML();
+  const iosSaf = isIOSSafari();
+  // 优先 File System Access API（仅 Chrome/Edge 支持）
+  if(window.showSaveFilePicker && !iosSaf){
+    try{
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'index.html',
+        types: [{description: 'HTML file', accept: {'text/html': ['.html']}}]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      msg.style.display='block';
+      msg.innerHTML='<div class="feedback show ok"><div class="h">✓ 已直接保存到原文件</div>下次打开时，错题会自动出现，无需任何手动操作。</div>';
+      return;
+    }catch(err){
+      if(err.name === 'AbortError') return;  // 用户取消
+      console.warn('File System Access 失败，降级为下载：', err);
+    }
+  }
+  // 降级：触发浏览器下载
+  const blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'index.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  msg.style.display='block';
+  if(iosSaf){
+    // iPhone Safari：文件保存到"文件"App（iCloud Drive → 下载）
+    msg.innerHTML=`<div class="feedback show ok">
+      <div class="h">✓ 已下载 index.html</div>
+      <div style="font-size:13px;line-height:1.7">
+        iPhone Safari <strong>无法</strong>直接覆盖原文件。请按下面流程操作：
+        <ol style="margin:6px 0 6px 18px;padding:0">
+          <li>打开"文件" App → 浏览 → "下载"（或 iCloud Drive）</li>
+          <li>找到刚下载的 <code>index.html</code></li>
+          <li>用 GitHub 手机 App 打开仓库 → 上传这个新文件覆盖</li>
+        </ol>
+        或者把文件 AirDrop 到电脑，从电脑 GitHub 上传。
+      </div>
+    </div>`;
+  } else {
+    msg.innerHTML='<div class="feedback show ok"><div class="h">✓ 已下载新版 index.html</div>把下载的文件<strong>替换原文件</strong>即可永久保存（也可上传到 GitHub 让网站版本更新）。</div>';
+  }
+}
+
+document.getElementById('embed-download').addEventListener('click', downloadUpdatedHTML);
+
+/* ============ GitHub 直接推送 ============
+   配置 PAT 后，可一键把新 HTML 推送到 GitHub 仓库，免手动上传。*/
+const GH_CONFIG_KEY = 'amc_review_gh_config_v1';
+const GH_AUTO_KEY = 'amc_review_gh_auto';
+
+function loadGHConfig(){
+  try {
+    const raw = JSON.parse(localStorage.getItem(GH_CONFIG_KEY)) || {};
+    if(raw.token && raw.owner && raw.repo && raw.branch) return raw;
+  } catch(e) {}
+  return {};
+}
+function saveGHConfig(cfg){ localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(cfg)); }
+function clearGHConfig(){ localStorage.removeItem(GH_CONFIG_KEY); }
+let ghConfig = loadGHConfig();
+let ghAutoPush = localStorage.getItem(GH_AUTO_KEY) === '1';
+
+function renderGHSection(){
+  ghConfig = loadGHConfig();
+  ghAutoPush = localStorage.getItem(GH_AUTO_KEY) === '1';
+  const configured = !!(ghConfig.token && ghConfig.owner && ghConfig.repo && ghConfig.branch);
+  document.getElementById('gh-push').style.display = configured ? '' : 'none';
+  document.getElementById('gh-status').style.display = configured ? 'block' : 'none';
+  document.getElementById('gh-auto').checked = ghAutoPush;
+  if(configured){
+    document.getElementById('gh-status-text').innerHTML =
+      `<code>${escapeHtml(ghConfig.owner)}/${escapeHtml(ghConfig.repo)}</code> @ <code>${escapeHtml(ghConfig.branch)}</code>`;
+  }
+}
+
+// Base64 编码（支持中文 UTF-8）
+function utf8ToBase64(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+// 手动推送
+async function pushToGitHub(){
+  const msg = document.getElementById('embed-msg');
+  if(!ghConfig.token){
+    msg.style.display='block';
+    msg.innerHTML='<div class="feedback show err"><div class="h">还没配置 GitHub</div>展开上面的"☁️ 配置"进行设置。</div>';
+    return;
+  }
+  if(!EMBEDDED_QUESTIONS.length){
+    msg.style.display='block';
+    msg.innerHTML='<div class="feedback show err"><div class="h">还没有嵌入任何错题</div>先在"AI 一键导入"粘贴 JSON 导入题目。</div>';
+    return;
+  }
+
+  msg.style.display='block';
+  msg.innerHTML='<div class="feedback show"><div class="h">⏳ 推送中...</div>1/3 获取 GitHub 上当前文件...</div>';
+
+  try {
+    // Step 1: 获取当前文件 SHA
+    const getUrl = `https://api.github.com/repos/${encodeURIComponent(ghConfig.owner)}/${encodeURIComponent(ghConfig.repo)}/contents/index.html?ref=${encodeURIComponent(ghConfig.branch)}`;
+    const getResp = await fetch(getUrl, {
+      headers: {'Authorization': `token ${ghConfig.token}`, 'Accept': 'application/vnd.github+json'}
+    });
+    if(!getResp.ok){
+      const err = await getResp.json().catch(()=>({message: getResp.statusText}));
+      throw new Error(`获取文件失败 (HTTP ${getResp.status}): ${err.message || ''}`);
+    }
+    const fileInfo = await getResp.json();
+    const sha = fileInfo.sha;
+
+    msg.innerHTML='<div class="feedback show"><div class="h">⏳ 推送中...</div>2/3 构建新 HTML（共 '+EMBEDDED_QUESTIONS.length+' 题）...</div>';
+
+    // Step 2: 构建 HTML
+    const newHTML = buildUpdatedHTML();
+    const b64 = utf8ToBase64(newHTML);
+
+    msg.innerHTML='<div class="feedback show"><div class="h">⏳ 推送中...</div>3/3 上传到 GitHub...</div>';
+
+    // Step 3: PUT
+    const putUrl = `https://api.github.com/repos/${encodeURIComponent(ghConfig.owner)}/${encodeURIComponent(ghConfig.repo)}/contents/index.html`;
+    const putResp = await fetch(putUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${ghConfig.token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Update embedded wrong questions (${EMBEDDED_QUESTIONS.length} 题)`,
+        content: b64,
+        sha: sha,
+        branch: ghConfig.branch,
+      })
+    });
+    if(!putResp.ok){
+      const err = await putResp.json().catch(()=>({message: putResp.statusText}));
+      throw new Error(`上传失败 (HTTP ${putResp.status}): ${err.message || ''}`);
+    }
+    const result = await putResp.json();
+    const siteUrl = `https://${ghConfig.owner}.github.io/${ghConfig.repo}/`;
+    msg.innerHTML=`<div class="feedback show ok">
+      <div class="h">✓ 已推送到 GitHub</div>
+      GitHub Pages 约 30 秒~1 分钟后自动部署。<br>
+      在任何设备访问 <a href="${siteUrl}" target="_blank" rel="noopener">${siteUrl}</a> 即可看到错题。
+      <div class="muted" style="font-size:12px;margin-top:6px">
+        提交：<a href="${result.commit.html_url}" target="_blank" rel="noopener">查看 commit</a>
+      </div>
+    </div>`;
+  } catch(e) {
+    msg.innerHTML=`<div class="feedback show err">
+      <div class="h">✗ 推送失败</div>
+      ${escapeHtml(e.message)}
+      <div class="muted" style="font-size:12px;margin-top:6px;line-height:1.5">
+        常见原因：
+        <ul style="margin:4px 0 0 18px">
+          <li>Token 无效或没有 <code>repo</code> 权限</li>
+          <li>仓库/分支名拼错（注意大小写）</li>
+          <li>网络/代理问题（iPhone 需要网络通畅）</li>
+        </ul>
+      </div>
+    </div>`;
+  }
+}
+
+// 测试连接
+async function testGHConnection(token, owner, repo){
+  const resp = await fetch(`https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`, {
+    headers: {'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json'}
+  });
+  if(!resp.ok){
+    let msg = resp.statusText;
+    try { const e = await resp.json(); msg = e.message || msg; } catch(_){}
+    throw new Error(`HTTP ${resp.status}: ${msg}`);
+  }
+  return await resp.json();
+}
+
+// 事件绑定
+document.getElementById('gh-save').addEventListener('click', ()=>{
+  const token = document.getElementById('gh-token').value.trim();
+  const owner = document.getElementById('gh-owner').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const branch = (document.getElementById('gh-branch').value || 'main').trim();
+  const msg = document.getElementById('embed-msg');
+  if(!token || !owner || !repo || !branch){
+    msg.style.display='block';
+    msg.innerHTML='<div class="feedback show err"><div class="h">所有字段都必须填写</div></div>';
+    return;
+  }
+  ghConfig = {token, owner, repo, branch};
+  saveGHConfig(ghConfig);
+  renderGHSection();
+  msg.style.display='block';
+  msg.innerHTML='<div class="feedback show ok"><div class="h">✓ 配置已保存</div>可以点"测试连接"验证。</div>';
+});
+
+document.getElementById('gh-test').addEventListener('click', async ()=>{
+  const token = document.getElementById('gh-token').value.trim();
+  const owner = document.getElementById('gh-owner').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  const msg = document.getElementById('embed-msg');
+  if(!token || !owner || !repo){
+    msg.style.display='block';
+    msg.innerHTML='<div class="feedback show err"><div class="h">需要填写 Token / Owner / Repo</div></div>';
+    return;
+  }
+  msg.style.display='block';
+  msg.innerHTML='<div class="feedback show"><div class="h">⏳ 测试中...</div></div>';
+  try {
+    const data = await testGHConnection(token, owner, repo);
+    msg.innerHTML=`<div class="feedback show ok">
+      <div class="h">✓ 连接成功</div>
+      仓库：<code>${escapeHtml(data.full_name)}</code><br>
+      默认分支：<code>${escapeHtml(data.default_branch)}</code>
+    </div>`;
+  } catch(e) {
+    msg.innerHTML=`<div class="feedback show err"><div class="h">✗ 连接失败</div>${escapeHtml(e.message)}</div>`;
+  }
+});
+
+document.getElementById('gh-clear').addEventListener('click', ()=>{
+  if(!confirm('清除 GitHub 配置？（之后需要重新设置才能同步）')) return;
+  ghConfig = {};
+  clearGHConfig();
+  document.getElementById('gh-token').value = '';
+  renderGHSection();
+  const msg = document.getElementById('embed-msg');
+  msg.style.display='block';
+  msg.innerHTML='<div class="feedback show ok"><div class="h">配置已清除</div></div>';
+});
+
+document.getElementById('gh-auto').addEventListener('change', (e)=>{
+  ghAutoPush = e.target.checked;
+  localStorage.setItem(GH_AUTO_KEY, ghAutoPush ? '1' : '0');
+});
+
+document.getElementById('gh-push').addEventListener('click', pushToGitHub);
+
+// 导入完成后，如果开启了自动推送，自动触发
+function maybeAutoPush(){
+  if(ghAutoPush && ghConfig.token){
+    pushToGitHub();
+  }
+}
+
+// 初始渲染
+renderGHSection();
 
 /* ============ 错题本 ============ */
 let wbFilter='all';
@@ -782,9 +1216,32 @@ function renderWrongBook(){
     chips.appendChild(b);
   });
 
-  // 合并两种错题：练习错题和手动录入
+  // 合并三种错题：练习错题 / 嵌入题库（永久）/ 手动录入
   const ids=Object.keys(store.wrong);
   const items=[];
+  // 先加入嵌入题库
+  EMBEDDED_QUESTIONS.forEach(q=>{
+    if(!q.id || !q.stem || !q.cat) return;
+    items.push({
+      id: q.id,
+      q: null,
+      w: {
+        wrongCount: 1,
+        lastAns: null,
+        marked: false,
+        summary: q.summary || '',
+        imageBase64: q.imageBase64 || null,
+        source: 'embedded'
+      },
+      cat: q.cat,
+      stem: q.stem,
+      options: q.options || null,
+      answer: q.answer || null,
+      title: q.title || null,
+      type: 'embedded'
+    });
+  });
+  // 再加入 localStorage 中的错题
   ids.forEach(id=>{
     const w=store.wrong[id];
     const q=QUESTIONS.find(q=>q.id===id);
@@ -811,7 +1268,10 @@ function renderWrongBook(){
   filtered.forEach(({id,w,cat,stem,options,answer,title,type})=>{
     const item=document.createElement('div');
     item.className='card wb-item';
-    const badge = type==='manual' ? ' · 手动录入' : (w.marked?' · 已标记':'');
+    let badge = '';
+    if(type==='embedded') badge = ' · 📦 永久';
+    else if(type==='manual') badge = (w.source==='ai'?' · AI 录入':' · 手动录入');
+    else if(w.marked) badge = ' · 已标记';
     const titleHtml = title ? `<div style="font-weight:700;color:var(--brand-dark);margin-bottom:4px;font-size:14px">📌 ${escapeHtml(title)}</div>` : '';
     item.innerHTML=`
       <div class="q-meta"><span class="tag">${CAT_LABEL(cat)}</span><span class="muted">错 ${w.wrongCount||0} 次${badge}</span></div>
@@ -825,7 +1285,7 @@ function renderWrongBook(){
       </div>
       <div class="actions">
         <button class="btn btn-ghost btn-sm" data-act="view">查看详情</button>
-        <button class="btn btn-ghost btn-sm" data-act="remove">移除</button>
+        ${type==='embedded' ? '<span class="muted" style="font-size:12px;align-self:center">永久存储，无法移除</span>' : '<button class="btn btn-ghost btn-sm" data-act="remove">移除</button>'}
       </div>
       <div class="feedback" style="margin-top:8px;display:none"></div>`;
     const fb=item.querySelector('.feedback');
@@ -848,16 +1308,38 @@ function renderWrongBook(){
           ${w.summary?`<div class="ans"><strong>要点：</strong><pre style="white-space:pre-wrap;font-family:inherit;margin:0;font-size:13px">${escapeHtml(w.summary)}</pre></div>`:''}`;
       }
     });
-    item.querySelector('[data-act=remove]').addEventListener('click', ()=>{
-      if(confirm('从错题本移除？')){ removeWrong(id); renderWrongBook(); }
-    });
+    const removeBtn = item.querySelector('[data-act=remove]');
+    if(removeBtn){
+      removeBtn.addEventListener('click', ()=>{
+        if(confirm('从错题本移除？')){ removeWrong(id); renderWrongBook(); }
+      });
+    }
     list.appendChild(item);
   });
 }
 document.getElementById('wb-redo').addEventListener('click', ()=>{
   const ids=Object.keys(store.wrong);
-  const pool=ids.map(id=>QUESTIONS.find(q=>q.id===id)).filter(Boolean);
-  if(!pool.length){ alert('错题本中没有内置题库的题目。手动录入的错题无法在此重做，请去错题本查看要点复习。'); return; }
+  // 包含嵌入题库的题目
+  const allIds = new Set([...ids, ...EMBEDDED_QUESTIONS.map(q=>q.id).filter(Boolean)]);
+  const pool=[];
+  allIds.forEach(id=>{
+    const q=QUESTIONS.find(q=>q.id===id);
+    if(q) pool.push(q);
+    else {
+      const eq = EMBEDDED_QUESTIONS.find(q=>q.id===id);
+      if(eq){
+        pool.push({
+          id: eq.id,
+          category: eq.cat,
+          stem: eq.stem,
+          options: eq.options || {},
+          answer: eq.answer || '',
+          explanation: (eq.title||'') + '\n' + (eq.summary||'')
+        });
+      }
+    }
+  });
+  if(!pool.length){ alert('错题本中没有可重做的题目。'); return; }
   for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
   go('practice');
   document.getElementById('pr-setup').style.display='none';
@@ -866,7 +1348,7 @@ document.getElementById('wb-redo').addEventListener('click', ()=>{
   renderQuestion();
 });
 document.getElementById('wb-clear').addEventListener('click', ()=>{
-  if(confirm('清空错题本？此操作不可撤销。')){ store.wrong={}; saveStore(store); renderWrongBook(); }
+  if(confirm('清空错题本？此操作不可撤销。\n\n注意：嵌入到 HTML 的"📦 永久"题目不会被清空。')){ store.wrong={}; saveStore(store); renderWrongBook(); }
 });
 
 /* ============ Lightbox ============ */
@@ -883,7 +1365,7 @@ document.getElementById('lightbox').addEventListener('click', function(e){
 
 /* ============ 统计 ============ */
 function renderStats(){
-  const t=totalSeen(), c=totalCorrect(), w=Object.keys(store.wrong).length;
+  const t=totalSeen(), c=totalCorrect(), w=Object.keys(store.wrong).length + EMBEDDED_QUESTIONS.length;
   document.getElementById('st-total').textContent=t;
   document.getElementById('st-correct').textContent=c;
   document.getElementById('st-wrong').textContent=w;
