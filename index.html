@@ -1,158 +1,277 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head>
+<html lang="zh-CN">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0d9488">
 <title>AMC 复习 · 澳大利亚执业医师考试</title>
 <style>
 :root{
-  --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
-  --brand:#0d9488; --brand-dark:#0f766e; --brand-soft:#ccfbf1;
-  --accent:#2563eb; --accent-soft:#dbeafe;
-  --ok:#16a34a; --ok-soft:#dcfce7; --err:#dc2626; --err-soft:#fee2e2;
-  --warn:#d97706; --warn-soft:#fef3c7;
-  --border:#e2e8f0; --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
-  --radius:12px;
+  /* Apple-style color tokens */
+  --bg:#f5f5f7; --bg-elev:#fafafa; --card:#ffffff; --ink:#1d1d1f;
+  --ink-2:#424245; --muted:#6e6e73; --muted-2:#86868b;
+  --brand:#1d9e75; --brand-dark:#0f6e56; --brand-soft:#e8f5ef;
+  --accent:#0071e3; --accent-soft:#e5f2fc;
+  --ok:#30d158; --ok-soft:#e8f9ed; --err:#ff3b30; --err-soft:#ffeae9;
+  --warn:#ff9500; --warn-soft:#fff4e5;
+  --border:rgba(0,0,0,.08); --border-strong:rgba(0,0,0,.12);
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
+  --shadow-lg:0 4px 16px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.04);
+  /* Emil Kowalski 的推荐曲线 */
+  --ease-out:cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out:cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-spring:cubic-bezier(0.32, 0.72, 0, 1);
+  --d-fast:120ms; --d-base:200ms; --d-slow:320ms;
+  --radius-sm:10px; --radius:14px; --radius-lg:18px; --radius-xl:22px;
+  /* 各页面主色（被 body[data-page] 覆盖） */
+  --page:#007aff; --page-dark:#0058a8; --page-soft:#e5f2fc; --page-glow:rgba(0,122,255,.35);
 }
+/* 各页面主题色 */
+body[data-page="home"]{--page:#007aff;--page-dark:#0058a8;--page-soft:#e5f2fc;--page-glow:rgba(0,122,255,.35)}
+body[data-page="practice"]{--page:#34c759;--page-dark:#248a3d;--page-soft:#e8f9ed;--page-glow:rgba(52,199,89,.35)}
+body[data-page="input"]{--page:#ff9500;--page-dark:#c47300;--page-soft:#fff4e5;--page-glow:rgba(255,149,0,.35)}
+body[data-page="wrong"]{--page:#ff3b30;--page-dark:#c4271f;--page-soft:#ffeae9;--page-glow:rgba(255,59,48,.35)}
+body[data-page="stats"]{--page:#af52de;--page-dark:#8942ab;--page-soft:#f3e8ff;--page-glow:rgba(175,82,222,.35)}
+body[data-page="about"]{--page:#6e6e73;--page-dark:#424245;--page-soft:#f5f5f7;--page-glow:rgba(110,110,115,.25)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-  background:var(--bg); color:var(--ink); line-height:1.6; -webkit-text-size-adjust:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  font-optical-sizing:auto;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+  background:var(--bg); color:var(--ink); line-height:1.55; letter-spacing:-0.005em;
+  -webkit-text-size-adjust:100%;
 }
 .wrap{max-width:760px;margin:0 auto;padding:0 16px 96px}
-/* topbar */
+/* topbar — Apple 风格的悬浮材质 */
 .topbar{
-  position:sticky; top:0; z-index:10; background:rgba(255,255,255,.92);
-  backdrop-filter:saturate(180%) blur(8px);
-  border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:10; background:rgba(255,255,255,.72);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid rgba(15,23,42,.06);
+  transition:background-color var(--d-base) var(--ease-out);
 }
 .topbar-inner{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
-.brand{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--brand-dark)}
-.brand .dot{width:28px;height:28px;border-radius:8px;background:var(--brand);display:grid;place-items:center;color:#fff;font-size:14px}
-.brand small{font-weight:500;color:var(--muted);font-size:12px;display:block;margin-top:-2px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--ink);letter-spacing:-0.015em}
+.brand .dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--page) 0%,var(--page-dark) 100%);display:grid;place-items:center;color:#fff;box-shadow:0 2px 8px -2px var(--page-glow),inset 0 1px 0 rgba(255,255,255,.25);transition:background var(--d-slow) var(--ease-out),box-shadow var(--d-slow) var(--ease-out)}
+.brand .dot svg{width:18px;height:18px;display:block}
+.brand small{font-weight:400;color:var(--muted);font-size:11px;display:block;margin-top:-2px;letter-spacing:0}
 /* nav */
-.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;background:rgba(0,0,0,.04);padding:3px;border-radius:11px}
+.nav::-webkit-scrollbar{display:none}
 .nav button{
-  border:0;background:transparent;color:var(--muted);font-size:13px;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:500;white-space:nowrap;
+  border:0;background:transparent;color:var(--muted);font-size:13px;padding:7px 12px;border-radius:8px;cursor:pointer;font-weight:500;white-space:nowrap;
+  transition:color var(--d-fast) var(--ease-out), background-color var(--d-fast) var(--ease-out), transform 100ms var(--ease-out);
+  -webkit-tap-highlight-color:transparent;
 }
-.nav button:hover{background:var(--brand-soft);color:var(--brand-dark)}
-.nav button.active{background:var(--brand);color:#fff}
+.nav button:active{transform:scale(0.96)}
+.nav button.active{background:var(--card);color:var(--page);box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);font-weight:600}
 /* page */
 .page{display:none;padding:16px 0}
-.page.active{display:block}
+.page.active{display:block;animation:fadePage 280ms var(--ease-out) backwards}
+@keyframes fadePage{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 /* card */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
-.section-title{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--ink)}
-.muted{color:var(--muted);font-size:13px}
-/* hero */
-.hero{background:linear-gradient(135deg,var(--brand),var(--brand-dark));color:#fff;border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
-.hero h1{font-size:22px;margin-bottom:6px;font-weight:800}
-.hero p{font-size:13px;opacity:.9}
-.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.hero-stat{background:rgba(255,255,255,.15);border-radius:10px;padding:12px}
-.hero-stat .num{font-size:24px;font-weight:800}
-.hero-stat .lbl{font-size:11px;opacity:.85}
-/* quick actions */
-.quick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin-bottom:14px;transition:box-shadow var(--d-base) var(--ease-out), transform var(--d-base) var(--ease-out)}
+.page.active .card{animation:cardIn 360ms var(--ease-out) backwards}
+.page.active .card:nth-child(1){animation-delay:0ms}
+.page.active .card:nth-child(2){animation-delay:50ms}
+.page.active .card:nth-child(3){animation-delay:100ms}
+.page.active .card:nth-child(4){animation-delay:150ms}
+.page.active .card:nth-child(5){animation-delay:200ms}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-size:17px;font-weight:600;margin-bottom:4px;color:var(--ink);letter-spacing:-0.018em;transition:color var(--d-slow) var(--ease-out)}
+.muted{color:var(--muted);font-size:13px;letter-spacing:-0.005em}
+/* 页面色彩身份：非首页的标题和主按钮跟随 --page 变色 */
+.page#p-practice .section-title,
+.page#p-input .section-title,
+.page#p-wrong .section-title,
+.page#p-stats .section-title,
+.page#p-about .section-title{color:var(--page)}
+/* 手动录入折叠：隐藏默认小三角，展开时雪佛龙旋转 */
+#mn-details > summary::-webkit-details-marker{display:none}
+#mn-details > summary::marker{content:""}
+#mn-details[open] .mn-chev{transform:rotate(180deg)}
+.btn-pri{background:var(--page);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.06),0 2px 8px -2px var(--page-glow);transition:transform 100ms var(--ease-out),background-color 180ms var(--ease-out),box-shadow 180ms var(--ease-out)}
+@media (hover: hover) and (pointer: fine){
+  .btn-pri:hover{background:var(--page-dark);box-shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px -2px var(--page-glow)}
+}
+/* 非首页的第一个卡片顶部加页面色标识条 */
+.page:not(#p-home).active .card:first-child{
+  position:relative;
+}
+.page:not(#p-home).active .card:first-child::before{
+  content:"";position:absolute;top:-1px;left:14px;right:14px;height:3px;border-radius:0 0 3px 3px;background:var(--page);
+}
+/* hero — 蓝色风格 */
+.hero{
+  background:linear-gradient(135deg,#3a9bff 0%,#007aff 45%,#0058a8 100%);
+  color:#fff;border-radius:var(--radius-lg);padding:26px 24px;margin-bottom:18px;
+  position:relative;overflow:hidden;
+  box-shadow:0 8px 24px -8px rgba(0,122,255,.4),0 2px 6px rgba(0,0,0,.04);
+}
+.hero::before{content:"";position:absolute;top:-40%;right:-25%;width:240px;height:240px;background:radial-gradient(circle,rgba(255,255,255,.25) 0%,transparent 65%);border-radius:50%;pointer-events:none;filter:blur(8px)}
+.hero::after{content:"";position:absolute;bottom:-30%;left:-15%;width:180px;height:180px;background:radial-gradient(circle,rgba(255,255,255,.1) 0%,transparent 70%);border-radius:50%;pointer-events:none;filter:blur(6px)}
+.hero h1{font-size:26px;margin-bottom:6px;font-weight:700;letter-spacing:-0.025em;line-height:1.15}
+.hero p{font-size:13.5px;opacity:.92;letter-spacing:-0.005em}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;position:relative}
+.hero-stat{
+  background:rgba(255,255,255,.2);border-radius:12px;padding:12px 14px;
+  backdrop-filter:blur(12px) saturate(180%);
+  -webkit-backdrop-filter:blur(12px) saturate(180%);
+  border:1px solid rgba(255,255,255,.22);
+  transition:transform var(--d-base) var(--ease-out), background-color var(--d-base) var(--ease-out);
+}
+.hero-stat:active{transform:scale(0.98)}
+.hero-stat .num{font-size:26px;font-weight:700;letter-spacing:-0.025em;line-height:1.1;font-feature-settings:"tnum" 1}
+.hero-stat .lbl{font-size:11.5px;opacity:.9;margin-top:2px;letter-spacing:0.01em}
+/* quick actions — 苹果风格的圆角和图标徽章 */
+.quick{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px}
 .quick a{
-  display:block;text-decoration:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;color:var(--ink);box-shadow:var(--shadow);
+  display:block;text-decoration:none;background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 14px;color:var(--ink);
+  box-shadow:var(--shadow);
+  transition:transform 100ms var(--ease-out), box-shadow var(--d-base) var(--ease-out), border-color var(--d-fast) var(--ease-out);
+  -webkit-tap-highlight-color:transparent;
 }
-.quick a:hover{border-color:var(--brand);transform:translateY(-1px)}
-.quick .t{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px}
-.quick .d{font-size:12px;color:var(--muted);margin-top:2px}
+.quick a:active{transform:scale(0.97)}
+@media (hover: hover) and (pointer: fine){
+  .quick a:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:transparent}
+}
+.quick .t{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;letter-spacing:-0.01em}
+.quick .ic{
+  width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:16px;
+  background:linear-gradient(135deg,#d4f7e0,#a8e6c1);
+  color:#1d7a3a;
+  box-shadow:inset 0 0 0 .5px rgba(52,199,89,.18);
+}
+.quick a:nth-child(2) .ic{background:linear-gradient(135deg,#ffe5c2,#ffc780);color:#a05a00;box-shadow:inset 0 0 0 .5px rgba(255,149,0,.2)}
+.quick a:nth-child(3) .ic{background:linear-gradient(135deg,#ffd4d0,#ffa39e);color:#a8201a;box-shadow:inset 0 0 0 .5px rgba(255,59,48,.2)}
+.quick .d{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45;letter-spacing:-0.005em}
 /* subject list */
-.subj{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.subj{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);transition:background-color var(--d-fast) var(--ease-out)}
 .subj:last-child{border-bottom:0}
-.subj .n{font-weight:600;font-size:14px}
-.subj .p{font-size:12px;color:var(--muted)}
-.bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:6px;width:140px}
-.bar>span{display:block;height:100%;background:var(--brand);border-radius:99px}
-/* category chips */
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.subj .n{font-weight:500;font-size:14px;letter-spacing:-0.005em;color:var(--ink)}
+.subj .p{font-size:12.5px;color:var(--muted);font-feature-settings:"tnum" 1}
+.bar{height:6px;background:var(--bg);border-radius:99px;overflow:hidden;margin-top:6px;width:140px;box-shadow:inset 0 1px 2px rgba(0,0,0,.04)}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-dark));border-radius:99px;transition:width 600ms var(--ease-out)}
+/* category chips — Apple 风格的胶囊 */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
 .chip{
-  border:1px solid var(--border);background:var(--card);color:var(--ink);
-  padding:8px 14px;border-radius:99px;cursor:pointer;font-size:13px;font-weight:500;
+  display:inline-flex;align-items:center;gap:5px;
+  border:1px solid var(--border);background:var(--card);color:var(--ink-2);
+  padding:7px 14px;border-radius:99px;cursor:pointer;font-size:13px;font-weight:500;
+  transition:transform 100ms var(--ease-out), background-color var(--d-fast) var(--ease-out), border-color var(--d-fast) var(--ease-out), color var(--d-fast) var(--ease-out);
+  -webkit-tap-highlight-color:transparent;letter-spacing:-0.005em;
 }
-.chip:hover{border-color:var(--brand)}
-.chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.chip .em{font-size:15px;line-height:1;display:inline-block;transform:translateY(-1px)}
+.chip:active{transform:scale(0.96)}
+@media (hover: hover) and (pointer: fine){
+  .chip:hover{background:var(--bg-elev)}
+}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 2px 6px -2px rgba(0,0,0,.25)}
 /* question */
 .q-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:10px}
-.tag{background:var(--brand-soft);color:var(--brand-dark);padding:2px 8px;border-radius:6px;font-weight:600;font-size:11px}
-.q-stem{font-size:15px;line-height:1.7;white-space:pre-wrap;margin-bottom:16px}
-.q-title{font-weight:700;color:var(--brand-dark);font-size:14px;margin-bottom:6px;padding:6px 10px;background:var(--brand-soft);border-radius:8px;display:inline-block}
+.tag{background:var(--brand-soft);color:var(--brand-dark);padding:2px 8px;border-radius:6px;font-weight:600;font-size:11px;letter-spacing:0.01em}
+.q-stem{font-size:15px;line-height:1.7;white-space:pre-wrap;margin-bottom:16px;letter-spacing:-0.005em}
+.q-title{font-weight:700;color:var(--brand-dark);font-size:14px;margin-bottom:6px;padding:6px 10px;background:var(--brand-soft);border-radius:8px;display:inline-block;letter-spacing:-0.005em}
 .opts{display:flex;flex-direction:column;gap:8px}
 .opt{
-  display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;background:var(--card);transition:all .12s;
+  display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;background:var(--card);
+  transition:transform 120ms var(--ease-out), background-color 180ms var(--ease-out), border-color 180ms var(--ease-out);
+  -webkit-tap-highlight-color:transparent;
 }
-.opt:hover{border-color:var(--brand);background:var(--brand-soft)}
-.opt .letter{width:26px;height:26px;border-radius:6px;background:var(--border);display:grid;place-items:center;font-weight:700;font-size:13px;flex-shrink:0}
-.opt .txt{font-size:14px;line-height:1.55}
-.opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+.opt:active{transform:scale(0.99)}
+@media (hover: hover) and (pointer: fine){
+  .opt:not(.disabled):hover{border-color:var(--brand);background:var(--brand-soft)}
+}
+.opt .letter{width:26px;height:26px;border-radius:6px;background:var(--border);display:grid;place-items:center;font-weight:700;font-size:13px;flex-shrink:0;transition:background-color 180ms var(--ease-out), color 180ms var(--ease-out)}
+.opt .txt{font-size:14px;line-height:1.55;letter-spacing:-0.005em}
+.opt.correct{border-color:var(--ok);background:var(--ok-soft);animation:correctPop 380ms var(--ease-spring)}
 .opt.correct .letter{background:var(--ok);color:#fff}
-.opt.wrong{border-color:var(--err);background:var(--err-soft)}
+.opt.wrong{border-color:var(--err);background:var(--err-soft);animation:wrongShake 320ms var(--ease-out)}
 .opt.wrong .letter{background:var(--err);color:#fff}
 .opt.disabled{cursor:default}
-.opt.disabled:hover{border-color:var(--border);background:var(--card)}
-.opt.disabled.correct:hover,.opt.disabled.wrong:hover{border-color:var(--ok);background:var(--ok-soft)}
-.opt.disabled.wrong:hover{border-color:var(--err);background:var(--err-soft)}
+@keyframes correctPop{0%{transform:scale(1)}40%{transform:scale(1.015)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 /* feedback */
-.feedback{margin-top:14px;padding:14px;border-radius:10px;font-size:14px;display:none}
-.feedback.show{display:block}
+.feedback{margin-top:14px;padding:14px;border-radius:var(--radius-sm);font-size:14px;display:none}
+.feedback.show{display:block;animation:feedbackPop 380ms var(--ease-spring) backwards}
 .feedback.ok{background:var(--ok-soft);border:1px solid #bbf7d0}
 .feedback.err{background:var(--err-soft);border:1px solid #fecaca}
-.feedback .h{font-weight:700;margin-bottom:4px}
+.feedback .h{font-weight:700;margin-bottom:4px;letter-spacing:-0.01em}
 .feedback .ans{margin-top:6px;padding-top:6px;border-top:1px dashed rgba(0,0,0,.1)}
 .feedback .ans b{color:var(--ok)}
+@keyframes feedbackPop{0%{opacity:0;transform:scale(0.96) translateY(4px)}100%{opacity:1;transform:scale(1) translateY(0)}}
 .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
 .btn{
-  border:0;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;
+  border:0;padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;
+  transition:transform 100ms var(--ease-out), background-color 180ms var(--ease-out), border-color 180ms var(--ease-out), color 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+  -webkit-tap-highlight-color:transparent;letter-spacing:-0.005em;
 }
-.btn-pri{background:var(--brand);color:#fff}
-.btn-pri:hover{background:var(--brand-dark)}
+.btn:active{transform:scale(0.97)}
 .btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--ink)}
-.btn-ghost:hover{border-color:var(--brand)}
+@media (hover: hover) and (pointer: fine){
+  .btn-ghost:hover{border-color:var(--brand);color:var(--brand-dark)}
+}
 .btn-warn{background:var(--warn-soft);color:var(--warn);border:1px solid #fde68a}
-.btn-warn:hover{background:#fde68a}
+@media (hover: hover) and (pointer: fine){
+  .btn-warn:hover{background:#fde68a}
+}
 .btn-sm{padding:8px 14px;font-size:12px}
-.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none !important}
 .progress-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:14px}
-.progress-bar>span{display:block;height:100%;background:var(--brand);transition:width .3s}
+.progress-bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-dark));transition:width 400ms var(--ease-out)}
 .q-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.q-head .idx{font-size:13px;color:var(--muted)}
+.q-head .idx{font-size:13px;color:var(--muted);letter-spacing:-0.005em}
 /* empty */
-.empty{text-align:center;padding:40px 20px;color:var(--muted)}
-.empty .ic{font-size:32px;margin-bottom:8px}
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty .ic{font-size:32px;margin-bottom:8px;opacity:.5}
 /* wrong book item */
-.wb-item{margin-bottom:12px}
-.wb-item .qs{font-size:14px;line-height:1.55;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.wb-item{margin-bottom:12px;animation:cardIn 360ms var(--ease-out) backwards}
+.wb-item .qs{font-size:14px;line-height:1.55;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-0.005em}
 .wb-item .meta{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .wb-item .meta .ans-x{color:var(--err);font-weight:600}
 .wb-item .meta .ans-ok{color:var(--ok);font-weight:600}
 .wb-item .actions{margin-top:8px}
 /* summary in wrong book */
 .wb-summary{background:var(--brand-soft);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.55}
-.wb-summary .sum-title{font-weight:700;color:var(--brand-dark);margin-bottom:4px;font-size:12px}
+.wb-summary .sum-title{font-weight:700;color:var(--brand-dark);margin-bottom:4px;font-size:12px;letter-spacing:0.01em;text-transform:uppercase}
 .wb-summary ul{margin:0;padding-left:16px}
 .wb-summary li{margin-bottom:2px}
-.wb-img{max-width:100%;max-height:200px;border-radius:8px;margin-top:10px;cursor:pointer;border:1px solid var(--border)}
+/* 内心OS：暖色便签风，跟官方解析视觉上明确分开 */
+.wb-innernote{background:#fff7e3;border-left:3px solid #ffb020;border-radius:6px;padding:9px 12px;margin-top:8px;font-size:13px;line-height:1.55;color:#5a3e1b;display:flex;gap:6px;align-items:flex-start}
+.wb-innernote .ic{flex-shrink:0;line-height:1.5}
+.wb-innernote .tx{white-space:pre-wrap;flex:1}
+.wb-innernote .ed{cursor:pointer;border:0;background:transparent;color:#a07820;font-size:11px;padding:0 4px;border-radius:4px;flex-shrink:0;line-height:1.5}
+.wb-innernote .ed:hover{background:rgba(255,176,32,0.15)}
+.wb-img{max-width:100%;max-height:200px;border-radius:8px;margin-top:10px;cursor:pointer;border:1px solid var(--border);transition:transform var(--d-base) var(--ease-out), box-shadow var(--d-base) var(--ease-out)}
+@media (hover: hover) and (pointer: fine){
+  .wb-img:hover{transform:scale(1.01);box-shadow:var(--shadow-lg)}
+}
 /* input page */
 .paste-zone{
-  border:2px dashed var(--border);border-radius:12px;padding:40px 20px;text-align:center;
-  cursor:pointer;transition:border-color .2s;margin-bottom:14px;background:var(--card);
+  border:2px dashed var(--border);border-radius:var(--radius);padding:40px 20px;text-align:center;
+  cursor:pointer;margin-bottom:14px;background:var(--card);
+  transition:border-color var(--d-base) var(--ease-out), background-color var(--d-base) var(--ease-out), transform 100ms var(--ease-out);
+  -webkit-tap-highlight-color:transparent;
 }
+.paste-zone:active{transform:scale(0.995)}
 .paste-zone:hover,.paste-zone.drag{border-color:var(--brand);background:var(--brand-soft)}
 .paste-zone .ic{font-size:28px;margin-bottom:8px}
-.paste-zone .hint{font-size:14px;font-weight:600;margin-bottom:2px}
+.paste-zone .hint{font-size:14px;font-weight:600;margin-bottom:2px;letter-spacing:-0.005em}
 .paste-zone .sub{font-size:12px;color:var(--muted)}
-.preview-img{max-width:100%;max-height:300px;border-radius:10px;margin-bottom:14px;display:block;border:1px solid var(--border)}
+.preview-img{max-width:100%;max-height:300px;border-radius:var(--radius-sm);margin-bottom:14px;display:block;border:1px solid var(--border)}
 /* form */
 .form-group{margin-bottom:14px}
-.form-group label{display:block;font-weight:600;font-size:13px;margin-bottom:4px;color:var(--ink)}
+.form-group label{display:block;font-weight:600;font-size:13px;margin-bottom:4px;color:var(--ink);letter-spacing:-0.005em}
 .form-group label .req{color:var(--err);margin-left:2px}
 .input,.textarea,.select{
-  width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;
+  width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;
   font-family:inherit;line-height:1.5;background:var(--card);color:var(--ink);
+  transition:border-color var(--d-fast) var(--ease-out), box-shadow var(--d-fast) var(--ease-out);
+  -webkit-tap-highlight-color:transparent;
 }
 .input:focus,.textarea:focus,.select:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px var(--brand-soft)}
 .textarea{min-height:80px;resize:vertical}
@@ -160,42 +279,53 @@ body{
 .opt-inputs{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:8px}
 .opt-inputs .opt-row{display:flex;flex-direction:column;gap:4px}
 .opt-inputs .opt-row label{font-weight:700;font-size:13px;text-align:center;color:var(--brand-dark)}
-.opt-inputs .opt-row input{width:100%;padding:8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit}
+.opt-inputs .opt-row input{width:100%;padding:8px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;transition:border-color var(--d-fast) var(--ease-out)}
 .opt-inputs .opt-row input:focus{border-color:var(--brand);outline:none}
 /* ai guide */
-.ai-guide{background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:10px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.6}
-.ai-guide .title{font-weight:700;color:var(--accent);margin-bottom:4px}
+.ai-guide{background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;font-size:13px;line-height:1.6}
+.ai-guide .title{font-weight:700;color:var(--accent);margin-bottom:4px;letter-spacing:-0.005em}
 .ai-guide code{background:var(--card);padding:2px 6px;border-radius:4px;font-size:12px}
 /* lightbox */
-.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;animation:fadePage 240ms var(--ease-out)}
 .lightbox.show{display:flex}
-.lightbox img{max-width:95vw;max-height:95vh;border-radius:8px}
-.lightbox .close{position:absolute;top:16px;right:16px;color:#fff;font-size:28px;cursor:pointer;width:36px;height:36px;display:grid;place-items:center;background:rgba(255,255,255,.2);border-radius:50%}
+.lightbox img{max-width:95vw;max-height:95vh;border-radius:8px;animation:lightboxIn 320ms var(--ease-spring)}
+@keyframes lightboxIn{0%{opacity:0;transform:scale(0.94)}100%{opacity:1;transform:scale(1)}}
+.lightbox .close{position:absolute;top:16px;right:16px;color:#fff;font-size:28px;cursor:pointer;width:36px;height:36px;display:grid;place-items:center;background:rgba(255,255,255,.2);border-radius:50%;transition:background-color var(--d-fast) var(--ease-out), transform 100ms var(--ease-out);-webkit-tap-highlight-color:transparent}
+.lightbox .close:active{transform:scale(0.92)}
+@media (hover: hover) and (pointer: fine){
+  .lightbox .close:hover{background:rgba(255,255,255,.32)}
+}
 /* stats */
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;box-shadow:var(--shadow)}
-.stat-box .n{font-size:22px;font-weight:800;color:var(--brand-dark)}
-.stat-box .l{font-size:11px;color:var(--muted);margin-top:2px}
+.stat-box{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:center;
+  box-shadow:var(--shadow);
+  transition:transform var(--d-base) var(--ease-out), box-shadow var(--d-base) var(--ease-out);
+}
+.stat-box:active{transform:scale(0.97)}
+.stat-box .n{font-size:24px;font-weight:700;color:var(--ink);letter-spacing:-0.025em;line-height:1.1;font-feature-settings:"tnum" 1}
+.stat-box .l{font-size:11.5px;color:var(--muted);margin-top:3px;letter-spacing:0.01em}
 .slist{margin-top:6px}
-.srow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.srow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);transition:background-color var(--d-fast) var(--ease-out)}
 .srow:last-child{border:0}
-.srow .nm{flex:0 0 130px;font-size:13px}
-.srow .bb{flex:1;height:8px;background:var(--border);border-radius:99px;overflow:hidden}
-.srow .bb>span{display:block;height:100%;background:var(--brand);border-radius:99px}
-.srow .pc{flex:0 0 48px;text-align:right;font-size:12px;font-weight:600;color:var(--muted)}
+.srow .nm{flex:0 0 130px;font-size:13.5px;letter-spacing:-0.005em;color:var(--ink-2)}
+.srow .bb{flex:1;height:8px;background:var(--bg);border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.04)}
+.srow .bb>span{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-dark));border-radius:99px;transition:width 600ms var(--ease-out)}
+.srow .pc{flex:0 0 48px;text-align:right;font-size:12.5px;font-weight:600;color:var(--ink-2);letter-spacing:-0.005em;font-feature-settings:"tnum" 1}
 /* about */
-.about h2{font-size:16px;margin:14px 0 6px;color:var(--brand-dark)}
-.about p{font-size:14px;margin-bottom:10px}
-.about ul{margin:0 0 10px 18px;font-size:13px}
+.about h2{font-size:16px;margin:16px 0 6px;color:var(--brand-dark);letter-spacing:-0.01em}
+.about p{font-size:14px;margin-bottom:10px;line-height:1.6}
+.about ul{margin:0 0 10px 18px;font-size:13px;line-height:1.7}
 .about li{margin-bottom:4px}
 /* ai zone */
-.ai-zone{background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-bottom:14px}
-.note{background:var(--warn-soft);border:1px solid #fde68a;color:#92400e;padding:10px 12px;border-radius:8px;font-size:13px;margin:12px 0}
+.ai-zone{background:var(--accent-soft);border:1px solid #bfdbfe;border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px}
+.note{background:var(--warn-soft);border:1px solid #fde68a;color:#92400e;padding:10px 12px;border-radius:8px;font-size:13px;margin:12px 0;line-height:1.6}
 .note code{background:rgba(255,255,255,.6);padding:1px 5px;border-radius:3px;font-size:12px}
 /* finish */
-.finish-ic{font-size:48px;text-align:center;margin:10px 0}
-.finish-tx{text-align:center;font-size:18px;font-weight:700;margin-bottom:6px}
+.finish-ic{font-size:48px;text-align:center;margin:10px 0;animation:popIn 480ms var(--ease-spring) backwards}
+.finish-tx{text-align:center;font-size:18px;font-weight:700;margin-bottom:6px;letter-spacing:-0.01em}
 .finish-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:16px}
+@keyframes popIn{0%{opacity:0;transform:scale(0.6)}60%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
 @media(max-width:520px){
   .stat-grid{grid-template-columns:repeat(3,1fr)}
   .quick{grid-template-columns:1fr}
@@ -204,11 +334,24 @@ body{
   .nav button{padding:8px;font-size:12px}
   .opt-inputs{grid-template-columns:1fr}
 }
+/* reduced motion — 全部动画降级 */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+/* reduced transparency — 给"减少透明"的用户更不透明的顶栏 */
+@media (prefers-reduced-transparency: reduce){
+  .topbar{background:rgba(255,255,255,.96);backdrop-filter:none;-webkit-backdrop-filter:none}
+}
 </style>
 </head>
 <body>
 <div class="topbar"><div class="topbar-inner">
-  <div class="brand"><span class="dot">✚</span><div>AMC 复习<small>澳大利亚执业医师考试</small></div></div>
+  <div class="brand"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg></span><div>AMC 复习<small>澳大利亚执业医师考试</small></div></div>
   <div class="nav">
     <button data-nav="home" class="active">首页</button>
     <button data-nav="practice">练习</button>
@@ -231,9 +374,9 @@ body{
       </div>
     </div>
     <div class="quick">
-      <a href="#" data-go="practice"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>练习</div><div class="d">按科目或随机做题</div></a>
-      <a href="#" data-go="input"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>录入</div><div class="d">JSON / 截图录入</div></a>
-      <a href="#" data-go="wrong"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>错题本</div><div class="d">复盘薄弱知识点</div></a>
+      <a href="#" data-go="practice"><div class="t"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>练习</div><div class="d">按科目或随机做题</div></a>
+      <a href="#" data-go="input"><div class="t"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>录入</div><div class="d">JSON / 截图录入</div></a>
+      <a href="#" data-go="wrong"><div class="t"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>错题本</div><div class="d">复盘薄弱知识点</div></a>
     </div>
     <div class="card">
       <div class="section-title">各科目进度</div>
@@ -268,7 +411,7 @@ body{
 
     <!-- 粘贴区域 -->
     <div class="paste-zone" id="paste-zone">
-      <div class="ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+      <div class="ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
       <div class="hint">点击此处或 Ctrl+V 粘贴错题截图</div>
       <div class="sub">截图留存到本地，后续发给我分析</div>
     </div>
@@ -279,16 +422,7 @@ body{
       <div class="section-title">AI 一键导入</div>
       <p class="muted">把 WorkBuddy 返回的 JSON 粘贴到下方，直接导入错题本</p>
       <div class="form-group" style="margin-top:12px">
-        <textarea class="textarea" id="ai-batch" placeholder="[
-  {
-    &quot;cat&quot;: &quot;paeds&quot;,
-    &quot;title&quot;: &quot;儿科-阴道出血&quot;,
-    &quot;stem&quot;: &quot;...&quot;,
-    &quot;options&quot;: {&quot;A&quot;:&quot;...&quot;, &quot;B&quot;:&quot;...&quot;},
-    &quot;answer&quot;: &quot;B&quot;,
-    &quot;summary&quot;: &quot;知识点...\n陷阱...&quot;
-  }
-]" style="min-height:200px;font-family:monospace;font-size:12px"></textarea>
+        <textarea class="textarea" id="ai-batch" placeholder='[&#10;  {&#10;    "cat": "paeds",&#10;    "title": "儿科-阴道出血",&#10;    "stem": "...",&#10;    "options": {"A":"...", "B":"..."},&#10;    "answer": "B",&#10;    "summary": "知识点...\n陷阱..."&#10;  }&#10;]' style="min-height:200px;font-family:monospace;font-size:12px"></textarea>
       </div>
       <div class="actions">
         <button class="btn btn-pri" id="ai-import">导入到错题本</button>
@@ -297,15 +431,77 @@ body{
       <div id="ai-import-msg" style="margin-top:10px;display:none"></div>
     </div>
 
+    <!-- 手动录入错题（标题常驻，功能点击展开） -->
+    <div class="card">
+      <details id="mn-details">
+        <summary class="section-title" style="cursor:pointer;list-style:none;outline:none;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <span>📝 手动录入错题</span>
+          <span class="muted mn-toggle" style="font-size:13px;font-weight:normal;display:inline-flex;align-items:center;gap:4px;flex-shrink:0">
+            <span class="mn-toggle-text">点击展开</span>
+            <svg class="mn-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 220ms var(--ease-out)"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </summary>
+        <p class="muted" style="margin-top:6px">填表保存到错题本。如果上面已经粘贴了截图，图片会一起带过去。</p>
+        <div class="form-group" style="margin-top:12px">
+          <label>科目 <span class="req">*</span></label>
+          <select class="input" id="mn-cat"></select>
+        </div>
+        <div class="form-group">
+          <label>标题 <span class="muted" style="font-weight:normal">（可选，便于在错题本查找）</span></label>
+          <input class="input" id="mn-title" placeholder="例：儿科-新生儿黄疸">
+        </div>
+        <div class="form-group">
+          <label>题干 <span class="req">*</span></label>
+          <textarea class="textarea" id="mn-stem" placeholder="直接输入题目内容（如果上面有截图，可以只写要点）" style="min-height:90px"></textarea>
+        </div>
+        <div class="form-group">
+          <label>选项 A - E <span class="muted" style="font-weight:normal">（可只填 A、B，AMC 大多数是 5 选 1）</span></label>
+          <div style="display:grid;grid-template-columns:24px 1fr;gap:6px 8px;align-items:center">
+            <span style="font-weight:600;color:var(--ink-2);text-align:center">A</span><input class="input" id="mn-optA" placeholder="选项 A">
+            <span style="font-weight:600;color:var(--ink-2);text-align:center">B</span><input class="input" id="mn-optB" placeholder="选项 B">
+            <span style="font-weight:600;color:var(--ink-2);text-align:center">C</span><input class="input" id="mn-optC" placeholder="选项 C">
+            <span style="font-weight:600;color:var(--ink-2);text-align:center">D</span><input class="input" id="mn-optD" placeholder="选项 D">
+            <span style="font-weight:600;color:var(--ink-2);text-align:center">E</span><input class="input" id="mn-optE" placeholder="选项 E">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>正确答案 <span class="req">*</span></label>
+          <select class="input" id="mn-answer">
+            <option value="">— 请选择 —</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="E">E</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>知识点 / 陷阱 <span class="muted" style="font-weight:normal">（可选，建议写：考察点 + 易错项）</span></label>
+          <textarea class="textarea" id="mn-summary" placeholder="考察什么、易错点、为什么其他选项错..." style="min-height:80px"></textarea>
+        </div>
+        <div class="form-group">
+          <label>💭 内心OS <span class="muted" style="font-weight:normal">（只给自己看的提醒，做题时<strong>隐藏</strong>，出答案时<strong>显示</strong>）</span></label>
+          <textarea class="textarea" id="mn-inner" placeholder="例：&#10;· 看到胸痛+ST抬高先想 STEMI，别被选项里的不稳定型心绞痛骗了&#10;· 老年人腹痛=先排查血管性，再想外科&#10;· 下次一定要先看心电图再下诊断" style="min-height:90px"></textarea>
+        </div>
+        <div id="mn-img-status" class="muted" style="font-size:12.5px;margin:-4px 0 12px;display:none">
+          🖼 已附带上方粘贴的截图，一起保存
+        </div>
+        <div class="actions">
+          <button class="btn btn-pri" id="mn-save">保存到错题本</button>
+          <button class="btn btn-ghost" id="mn-clear">清空表单</button>
+        </div>
+        <div id="mn-msg" style="margin-top:10px;display:none"></div>
+      </details>
+    </div>
+
     <!-- 永久存储：嵌入到 HTML -->
     <div class="card">
       <div class="section-title">📦 永久存储错题</div>
       <p class="muted">导入的错题<strong>自动嵌入</strong>，立即可用。可选配置 GitHub 自动推送（一次设置，之后每次粘贴 JSON 都自动同步到全设备）。</p>
       <div class="note" style="margin-top:10px">
-        <strong>三条路：</strong>
-        <br>① <strong>GitHub 自动同步</strong>（推荐）：配置一次，永久全自动 →
+        <strong>两条路：</strong>
+        <br>① <strong>GitHub 自动同步</strong>：在这台 iPhone 上配一次 Token，之后录入错题自动推送，永久不用再填
         <br>② <strong>下载 HTML</strong>：下载新文件后手动替换（电脑端体验最佳）
-        <br>③ <strong>复制代码</strong>：把 JS 代码贴进源文件（如果习惯编辑代码）
       </div>
 
       <!-- GitHub 自动同步配置（折叠） -->
@@ -332,24 +528,29 @@ body{
             <input class="input" id="gh-branch" value="main">
           </div>
           <div class="actions" style="margin-top:10px">
-            <button class="btn btn-pri btn-sm" id="gh-save">保存配置</button>
+            <button class="btn btn-pri btn-sm" id="gh-save">保存配置（仅此一次）</button>
             <button class="btn btn-ghost btn-sm" id="gh-test">测试连接</button>
             <button class="btn btn-ghost btn-sm" id="gh-clear" style="margin-left:auto;color:var(--err)">清除</button>
+          </div>
+
+          <div style="margin-top:10px;padding:10px 12px;background:var(--ok-soft);border-radius:8px;font-size:12.5px;line-height:1.55;color:#1d6f3a">
+            💡 <b>本机只需配一次</b>。配置后 token 存到这台 iPhone 的浏览器里，<b>之后不再要求输入</b>。下次直接录题、点"自动推送"即可。
           </div>
         </div>
       </details>
 
       <!-- 配置成功的状态条 -->
-      <div id="gh-status" style="margin-top:14px;padding:10px 12px;background:var(--ok-soft);border-radius:8px;display:none;font-size:13px">
+      <div id="gh-status" style="margin-top:14px;padding:12px 14px;background:var(--ok-soft);border-radius:10px;display:none;font-size:13px;line-height:1.55">
         <div><b style="color:var(--ok)">✓ 已连接：</b><span id="gh-status-text"></span></div>
-        <label style="margin-top:6px;display:inline-flex;align-items:center;gap:6px;cursor:pointer">
-          <input type="checkbox" id="gh-auto" style="margin:0"> <span>导入错题后自动推送到 GitHub（推荐开启）</span>
+        <div style="font-size:12px;color:#1d6f3a;margin-top:4px;opacity:.9">💡 本机配置已记住，之后录入错题会自动推送，不用再填 token。</div>
+        <label style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="gh-auto" style="margin:0"> <span style="font-weight:500">导入错题后自动推送到 GitHub</span>
         </label>
       </div>
 
       <div style="margin-top:14px">
         <div style="font-size:13px;font-weight:600;margin-bottom:6px">已嵌入 <span id="embed-count">0</span> 题</div>
-        <textarea class="textarea" id="embed-code" style="min-height:100px;font-family:monospace;font-size:12px" readonly="" placeholder="// 嵌入的题目会显示在这里（只读）"></textarea>
+        <textarea class="textarea" id="embed-code" style="min-height:100px;font-family:monospace;font-size:12px" readonly placeholder="// 嵌入的题目会显示在这里（只读）"></textarea>
       </div>
 
       <div class="actions" style="margin-top:10px;flex-wrap:wrap">
@@ -386,6 +587,8 @@ body{
       </div>
       <div class="section-title" style="margin-top:6px">各科目正确率</div>
       <div id="st-subjs" class="slist"></div>
+      <div class="section-title" style="margin-top:14px">各科错题数</div>
+      <div id="st-wrong-by-cat" class="slist"></div>
     </div>
   </div>
 
@@ -411,7 +614,7 @@ body{
         <li>Women's Health（产科与妇科）：15</li>
         <li>Child Health（儿科）：15</li>
         <li>Mental Health（精神科）：15</li>
-        <li>Population Health &amp; Ethics：15</li>
+        <li>Population Health & Ethics：15</li>
       </ul>
 
       <h2>使用方法</h2>
@@ -429,7 +632,7 @@ body{
 </div>
 
 <!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox"><span class="close" id="lb-close">×</span><img id="lb-img" src="" alt=""></div>
+<div class="lightbox" id="lightbox"><span class="close" id="lb-close">&times;</span><img id="lb-img" src="" alt=""></div>
 
 <script>
 /* ============ 题库数据 ============ */
@@ -442,6 +645,27 @@ const CATEGORIES = [
   {key:'phe',       label:'Pop Health & Ethics',weight:15},
 ];
 const CAT_LABEL = k => (CATEGORIES.find(c=>c.key===k)||{}).label || k;
+/* 各科主题色（用于进度条、徽章、图例） */
+const CAT_COLORS = {
+  medicine:{c:'#007aff',s:'#e5f2fc'},  // 内 - 蓝
+  surgery: {c:'#ff3b30',s:'#ffeae9'},  // 外 - 红
+  og:      {c:'#af52de',s:'#f3e8ff'},  // 妇产 - 紫
+  paeds:   {c:'#ff2d92',s:'#ffe0ee'},  // 儿科 - 粉
+  psych:   {c:'#00c7be',s:'#d8f5f3'},  // 精神 - 青
+  phe:     {c:'#ff9500',s:'#fff4e5'},  // 公卫 - 橙
+};
+const catColor = k => (CAT_COLORS[k] && CAT_COLORS[k].c) || '#6e6e73';
+const catSoft  = k => (CAT_COLORS[k] && CAT_COLORS[k].s) || '#f5f5f7';
+/* 各科对应人群 emoji */
+const CAT_EMOJI = {
+  medicine: '👨',  // 成人
+  surgery:  '🏥',  // 手术室
+  og:       '🤰',  // 孕妇
+  paeds:    '👶',  // 婴儿
+  psych:    '🧠',  // 大脑
+  phe:      '🌍',  // 全球
+};
+const catEmoji = k => CAT_EMOJI[k] || '📚';
 
 const QUESTIONS = [
   {id:'ex001',category:'medicine',stem:'55岁男性，吸烟30年。2小时前突发胸骨后压榨样疼痛，向左臂放射，伴大汗。BP 90/60，HR 110。ECG：II/III/aVF ST段抬高。最可能的诊断是？',options:{A:'急性前壁心肌梗死',B:'急性下壁心肌梗死',C:'急性心包炎',D:'主动脉夹层',E:'肺栓塞'},answer:'B',explanation:'II/III/aVF 对应下壁，由右冠状动脉供血。胸骨后压榨样疼痛放射左臂+大汗+ECG下壁ST抬高，符合急性下壁STEMI。'},
@@ -471,9 +695,8 @@ const FILE_SOURCE = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
      imageBase64 - 选填，截图（base64 编码）
 */
 let EMBEDDED_QUESTIONS = [
-  {"id":"embed_k8ig8k","cat":"paeds","stem":"A 4-year-old girl presents with a small amount of vaginal bleeding. She is afebrile, has no abdominal pain, and there is no history of trauma. On examination, the external genitalia appear normal, there are no bruises, and the hymen is intact. Rectal examination is unremarkable. The abdomen is soft and non-tender. What is the most likely diagnosis?","title":"Paediatrics - Vaginal Bleeding","options":{"A":"Precocious puberty","B":"Vaginal foreign body","C":"Urethral mucosal prolapse","D":"Vulvovaginitis","E":"Sexual abuse"},"answer":"B","summary":"知识点：\n• 学龄前女童阴道出血，最常见原因为阴道异物（玩具小零件、纸巾等）\n• 体征：处女膜完整、外阴正常、无外伤瘀斑\n• 鉴别：性早熟（伴乳房发育等第二性征）、尿道黏膜脱垂（尿道口环形肿物）、性虐待（多有瘀斑或行为异常）\n\n陷阱：\n• 不要因家属否认就排除异物可能\n• 需追问玩耍史、是否有小物件丢失"},
-  {"id":"embed_24deup","cat":"paeds","stem":"A 3-year-old boy is brought in by his parents who noticed a painless midline neck swelling that moves upward on swallowing. The mass is soft, well-circumscribed, and non-tender. What is the most likely diagnosis?","title":"Paediatrics - Midline Neck Swelling","options":{"A":"Branchial cleft cyst","B":"Thyroglossal duct cyst","C":"Lymphadenitis","D":"Dermoid cyst","E":"Ectopic thyroid tissue"},"answer":"B","summary":"知识点：\n• 甲状腺舌管囊肿（Thyroglossal duct cyst）：颈前中线无痛性囊性肿物，随吞咽/伸舌上下移动\n• 为胚胎期甲状腺舌管未完全退化所致\n• 好发于1-10岁儿童\n• 鉴别：鳃裂囊肿（位于胸锁乳突肌前缘）、淋巴结炎（多发、有压痛、活动度差）、皮样囊肿（不随吞咽移动）、异位甲状腺（罕见，需超声+核素扫描排除）\n\n陷阱：\n• 术前必须超声确认正常位置甲状腺存在，避免切除异位甲状腺（唯一功能性甲状腺组织）"},
-  {"id":"embed_s73l7l","cat":"paeds","stem":"An 8-year-old boy is found to have protein (++) on a school screening urinalysis. He has no oedema, his blood pressure is normal, and there is no macroscopic haematuria. A repeat first-morning urine sample shows no protein. What is the most likely diagnosis?","title":"Paediatrics - Proteinuria","options":{"A":"Minimal change disease","B":"Orthostatic (postural) proteinuria","C":"Acute glomerulonephritis","D":"IgA nephropathy","E":"Alport syndrome"},"answer":"B","summary":"知识点：\n• 体位性蛋白尿（Orthostatic proteinuria）：直立位时出现蛋白尿，卧位（晨尿）消失\n• 为青少年最常见良性蛋白尿原因\n• 24h尿蛋白定量通常<1g\n• 预后良好，无需特殊治疗\n• 鉴别要点：晨尿阴性、无水肿高血压、肾功能正常\n\n陷阱：\n• 关键检查：晨尿复查！不要看到尿蛋白就做肾活检\n• 需排除：肾病综合征（大量蛋白尿+低蛋白血症+水肿）、肾炎（血尿+高血压+肾功能异常）"}
+  // 示例（可删除）：
+  // {id:'embed_demo', cat:'medicine', title:'示例', stem:'题干', options:{A:'选项A',B:'选项B'}, answer:'A', summary:'要点总结'},
 ];
 
 /* ============ 本地缓存：影子备份 ============
@@ -596,6 +819,7 @@ function go(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const page = document.getElementById('p-'+name);
   if(page) page.classList.add('active');
+  document.body.setAttribute('data-page', name);
   document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.nav===name));
   if(name==='home') renderHome();
   if(name==='practice') renderPracticeSetup();
@@ -604,6 +828,7 @@ function go(name){
   if(name==='stats') renderStats();
   window.scrollTo(0,0);
 }
+document.body.setAttribute('data-page','home');
 document.querySelectorAll('.nav button').forEach(b=> b.addEventListener('click', ()=>go(b.dataset.nav)));
 document.querySelectorAll('[data-go]').forEach(a=> a.addEventListener('click', e=>{e.preventDefault();go(a.dataset.go);}));
 
@@ -619,7 +844,9 @@ function renderHome(){
     const rate = s.seen? Math.round(s.correct/s.seen*100):0;
     const row=document.createElement('div');
     row.className='subj';
-    row.innerHTML=`<div><div class="n">${cat.label}</div><div class="p">已做 ${s.seen} · 正确 ${rate}%</div><div class="bar"><span style="width:${rate}%"></span></div></div><div class="muted" style="font-size:12px">权重 ${cat.weight}</div>`;
+    const color = catColor(cat.key);
+    const soft  = catSoft(cat.key);
+    row.innerHTML=`<div style="flex:1;min-width:0"><div class="n"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:8px;vertical-align:1px;box-shadow:0 0 0 2px ${soft}"></span><span style="font-size:16px;margin-right:6px;vertical-align:-2px">${catEmoji(cat.key)}</span>${cat.label}</div><div class="p">已做 ${s.seen} · 正确 ${rate}%</div><div class="bar"><span style="width:${rate}%;background:${color}"></span></div></div><div class="muted" style="font-size:12px">权重 ${cat.weight}</div>`;
     wrap.appendChild(row);
   });
 }
@@ -641,7 +868,7 @@ function renderPracticeSetup(){
   CATEGORIES.forEach(cat=>{
     const b=document.createElement('button');
     b.className='chip';
-    b.textContent=cat.label;
+    b.innerHTML=`<span class="em">${catEmoji(cat.key)}</span>${cat.label}`;
     b.onclick=()=>{chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));b.classList.add('active');startSession(cat.key, b)};
     chips.appendChild(b);
   });
@@ -748,7 +975,8 @@ function onPick(L){
   fb.className='feedback show '+(correct?'ok':'err');
   fb.innerHTML=`<div class="h">${correct?'✓ 回答正确':'✗ 回答错误'}</div>
     <div>正确答案：<b>${q.answer}</b> · ${escapeHtml(q.options[q.answer])}</div>
-    <div class="ans"><strong>解析：</strong>${escapeHtml(q.explanation)}</div>`;
+    <div class="ans"><strong>解析：</strong>${escapeHtml(q.explanation)}</div>
+    ${q.innerNote ? `<div class="wb-innernote" style="margin-top:8px"><span class="ic">💭</span><div class="tx"><strong style="color:#7a4f0a">你的内心OS：</strong>${escapeHtml(q.innerNote)}</div></div>` : ''}`;
   document.getElementById('pr-next').disabled=false;
   document.getElementById('pr-next').textContent = (session.idx+1>=session.pool.length)?'查看结果':'下一题';
 }
@@ -787,6 +1015,16 @@ function renderInputPage(){
   if(preview){ preview.style.display='none'; }
   document.getElementById('ai-batch').value = '';
   document.getElementById('ai-import-msg').style.display='none';
+  // 同步重置手动录入表单
+  const zone=document.getElementById('paste-zone');
+  if(zone){
+    zone.querySelector('.hint').textContent='点击此处或 Ctrl+V 粘贴错题截图';
+    zone.querySelector('.sub').textContent='截图留存到本地，后续发给我分析';
+  }
+  const imgStatus=document.getElementById('mn-img-status');
+  if(imgStatus) imgStatus.style.display='none';
+  const mnMsg=document.getElementById('mn-msg');
+  if(mnMsg) mnMsg.style.display='none';
   renderEmbedSection();
 }
 
@@ -809,6 +1047,8 @@ document.addEventListener('paste', function(e){
         const zone = document.getElementById('paste-zone');
         zone.querySelector('.hint').textContent = '截图已粘贴（点击可重新粘贴）';
         zone.querySelector('.sub').textContent = '图片已保存，可填写下方表单后保存';
+        const imgStatus = document.getElementById('mn-img-status');
+        if(imgStatus) imgStatus.style.display = 'block';
       };
       reader.readAsDataURL(blob);
       break;
@@ -833,6 +1073,8 @@ document.getElementById('paste-zone').addEventListener('click', function(){
       const zone = document.getElementById('paste-zone');
       zone.querySelector('.hint').textContent = '截图已粘贴（点击可重新选择）';
       zone.querySelector('.sub').textContent = '图片已保存，可填写下方表单后保存';
+      const imgStatus = document.getElementById('mn-img-status');
+      if(imgStatus) imgStatus.style.display = 'block';
     };
     reader.readAsDataURL(file);
   };
@@ -874,6 +1116,7 @@ document.getElementById('ai-import').addEventListener('click', function(){
     if(item.options) eq.options = item.options;
     if(item.answer !== undefined && item.answer !== null) eq.answer = item.answer;
     if(item.summary) eq.summary = item.summary;
+    if(item.innerNote) eq.innerNote = item.innerNote;
     if(item.imageBase64) eq.imageBase64 = item.imageBase64;
     EMBEDDED_QUESTIONS.push(eq);
     existingIds.add(id);
@@ -897,6 +1140,106 @@ document.getElementById('ai-import').addEventListener('click', function(){
 document.getElementById('ai-import-clear').addEventListener('click', function(){
   document.getElementById('ai-batch').value = '';
   document.getElementById('ai-import-msg').style.display='none';
+});
+
+/* ============ 手动录入表单 ============ */
+// 折叠/展开时切换 "点击展开 ↔ 收起" 文案
+document.getElementById('mn-details').addEventListener('toggle', function(){
+  const txt = this.querySelector('.mn-toggle-text');
+  if(txt) txt.textContent = this.open ? '收起' : '点击展开';
+});
+
+// 填充科目下拉（一次性）
+(function populateMnCat(){
+  const sel = document.getElementById('mn-cat');
+  if(!sel || sel.options.length) return;
+  CATEGORIES.forEach(c=>{
+    const o = document.createElement('option');
+    o.value = c.key;
+    o.textContent = catEmoji(c.key) + ' ' + c.label;
+    sel.appendChild(o);
+  });
+})();
+
+function resetManualForm(){
+  ['mn-title','mn-stem','mn-summary','mn-inner'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  ['A','B','C','D','E'].forEach(L=>{
+    const el=document.getElementById('mn-opt'+L);
+    if(el) el.value='';
+  });
+  const ans=document.getElementById('mn-answer');
+  if(ans) ans.value='';
+  inputImageBase64='';
+  const preview=document.getElementById('in-preview');
+  if(preview){ preview.src=''; preview.style.display='none'; }
+  const zone=document.getElementById('paste-zone');
+  if(zone){
+    zone.querySelector('.hint').textContent='点击此处或 Ctrl+V 粘贴错题截图';
+    zone.querySelector('.sub').textContent='截图留存到本地，后续发给我分析';
+  }
+  const imgStatus=document.getElementById('mn-img-status');
+  if(imgStatus) imgStatus.style.display='none';
+}
+
+document.getElementById('mn-clear').addEventListener('click', function(){
+  resetManualForm();
+  const msg=document.getElementById('mn-msg');
+  if(msg) msg.style.display='none';
+});
+
+document.getElementById('mn-save').addEventListener('click', function(){
+  const cat = document.getElementById('mn-cat').value;
+  const stem = document.getElementById('mn-stem').value.trim();
+  const title = document.getElementById('mn-title').value.trim();
+  const opts = {};
+  ['A','B','C','D','E'].forEach(L=>{
+    const v = document.getElementById('mn-opt'+L).value.trim();
+    if(v) opts[L] = v;
+  });
+  const answer = document.getElementById('mn-answer').value;
+  const summary = document.getElementById('mn-summary').value.trim();
+  const innerNote = document.getElementById('mn-inner').value.trim();
+  const msg = document.getElementById('mn-msg');
+
+  function showErr(h, sub){
+    msg.style.display='block';
+    msg.innerHTML=`<div class="feedback show err"><div class="h">${h}</div>${sub||''}</div>`;
+  }
+
+  if(!cat){ showErr('请选择科目'); return; }
+  if(!stem && !inputImageBase64){ showErr('请填写题干或粘贴截图', '<div>题干和截图至少要有一个</div>'); return; }
+  if(answer && !opts[answer]){ showErr('答案 '+answer+' 的选项内容是空的', '<div>请填上该选项，或改选其他答案</div>'); return; }
+
+  // 稳定 id：内容+图片一起算
+  const contentKey = (stem||title||'') + '|' + JSON.stringify(opts) + '|' + answer + '|' + summary + '|' + (inputImageBase64 ? 'with-img' : 'no-img');
+  const id = 'embed_' + simpleHash(contentKey);
+  if(EMBEDDED_QUESTIONS.find(q=>q.id===id)){
+    showErr('这道题已经在错题本里了');
+    return;
+  }
+
+  const eq = {
+    id, cat,
+    stem: stem || '(见截图)',
+    title: title || (stem ? stem.substring(0,25) : '截图题')
+  };
+  if(Object.keys(opts).length) eq.options = opts;
+  if(answer) eq.answer = answer;
+  if(summary) eq.summary = summary;
+  if(innerNote) eq.innerNote = innerNote;
+  if(inputImageBase64) eq.imageBase64 = inputImageBase64;
+
+  EMBEDDED_QUESTIONS.push(eq);
+  saveEmbeddedShadow();
+  renderEmbedSection();
+  maybeAutoPush();
+
+  msg.style.display='block';
+  msg.innerHTML=`<div class="feedback show ok"><div class="h">✓ 已保存到错题本</div>${ghAutoPush && ghConfig.token ? '正在自动推送到 GitHub…' : '如需永久保存，点下方 💾 下载新版 HTML'}<br><a href="#" style="color:var(--brand-dark);font-weight:600;font-size:13px" onclick="go('wrong');return false">去错题本查看 →</a></div>`;
+  resetManualForm();
 });
 
 // 简单稳定 hash（用于内容寻址 id）
@@ -1161,9 +1504,14 @@ document.getElementById('gh-save').addEventListener('click', ()=>{
   }
   ghConfig = {token, owner, repo, branch};
   saveGHConfig(ghConfig);
+  // 首次保存时自动开启自动推送（用户已经选择"保存配置"了，等于认同推送）
+  if(!ghAutoPush){
+    ghAutoPush = true;
+    localStorage.setItem(GH_AUTO_KEY, '1');
+  }
   renderGHSection();
   msg.style.display='block';
-  msg.innerHTML='<div class="feedback show ok"><div class="h">✓ 配置已保存</div>可以点"测试连接"验证。</div>';
+  msg.innerHTML='<div class="feedback show ok"><div class="h">✓ 已保存</div>Token 已记在这台 iPhone 上，<b>之后不用再填</b>。下方会自动推送开关已默认开启。</div>';
 });
 
 document.getElementById('gh-test').addEventListener('click', async ()=>{
@@ -1201,6 +1549,8 @@ document.getElementById('gh-clear').addEventListener('click', ()=>{
   msg.innerHTML='<div class="feedback show ok"><div class="h">配置已清除</div></div>';
 });
 
+/* ============ 恢复码相关代码已移除（单设备方案不需要） ============ */
+
 document.getElementById('gh-auto').addEventListener('change', (e)=>{
   ghAutoPush = e.target.checked;
   localStorage.setItem(GH_AUTO_KEY, ghAutoPush ? '1' : '0');
@@ -1232,7 +1582,7 @@ function renderWrongBook(){
   CATEGORIES.forEach(cat=>{
     const b=document.createElement('button');
     b.className='chip '+(wbFilter===cat.key?'active':'');
-    b.textContent=cat.label;
+    b.innerHTML=`<span class="em">${catEmoji(cat.key)}</span>${cat.label}`;
     b.onclick=()=>{wbFilter=cat.key;renderWrongBook();};
     chips.appendChild(b);
   });
@@ -1252,6 +1602,7 @@ function renderWrongBook(){
         marked: false,
         summary: q.summary || '',
         imageBase64: q.imageBase64 || null,
+        innerNote: q.innerNote || null,
         source: 'embedded'
       },
       cat: q.cat,
@@ -1300,6 +1651,7 @@ function renderWrongBook(){
       <div class="qs">${escapeHtml(stem)}</div>
       ${w.imageBase64 ? `<img class="wb-img" src="${w.imageBase64}" alt="截图" onclick="openLightbox(this.src)">` : ''}
       ${w.summary ? `<div class="wb-summary"><div class="sum-title">要点总结</div><div style="white-space:pre-wrap">${escapeHtml(w.summary)}</div></div>` : ''}
+      ${w.innerNote ? `<div class="wb-innernote"><span class="ic">💭</span><div class="tx"><strong style="color:#7a4f0a">你的内心OS：</strong>${escapeHtml(w.innerNote)}</div><button class="ed" data-act="edit-note" title="编辑">编辑</button></div>` : ''}
       <div class="meta">
         ${w.lastAns?`<span>你曾选 <span class="ans-x">${w.lastAns}</span></span>`:''}
         ${answer?`<span>正确答案 <span class="ans-ok">${answer}</span></span>`:''}
@@ -1345,6 +1697,30 @@ function renderWrongBook(){
         }
       });
     }
+    // 编辑内心OS（embedded → 改 EMBEDDED_QUESTIONS；practice/manual → 改 store.wrong）
+    const editNoteBtn = item.querySelector('[data-act=edit-note]');
+    if(editNoteBtn){
+      editNoteBtn.addEventListener('click', ()=>{
+        const cur = w.innerNote || '';
+        const next = prompt('💭 编辑内心OS（只给自己看的提醒）', cur);
+        if(next === null) return; // 取消
+        const trimmed = next.trim();
+        if(type==='embedded'){
+          const eq = EMBEDDED_QUESTIONS.find(q=>q.id===id);
+          if(eq){
+            if(trimmed) eq.innerNote = trimmed;
+            else delete eq.innerNote;
+            saveEmbeddedShadow();
+            maybeAutoPush();
+          }
+        } else {
+          if(trimmed) store.wrong[id].innerNote = trimmed;
+          else delete store.wrong[id].innerNote;
+          saveStore(store);
+        }
+        renderWrongBook();
+      });
+    }
     list.appendChild(item);
   });
 }
@@ -1365,7 +1741,8 @@ document.getElementById('wb-redo').addEventListener('click', ()=>{
           stem: eq.stem,
           options: eq.options || {},
           answer: eq.answer || '',
-          explanation: (eq.title||'') + '\n' + (eq.summary||'')
+          explanation: (eq.title||'') + '\n' + (eq.summary||''),
+          innerNote: eq.innerNote || null
         });
       }
     }
@@ -1407,11 +1784,44 @@ function renderStats(){
     const rate = s.seen? Math.round(s.correct/s.seen*100):0;
     const row=document.createElement('div');
     row.className='srow';
-    row.innerHTML=`<div class="nm">${cat.label}</div><div class="bb"><span style="width:${rate}%"></span></div><div class="pc">${rate}%</div>`;
+    const color = catColor(cat.key);
+    row.innerHTML=`<div class="nm"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px;vertical-align:0;box-shadow:0 0 0 2px ${catSoft(cat.key)}"></span><span style="font-size:15px;margin-right:4px;vertical-align:-2px">${catEmoji(cat.key)}</span>${cat.label}</div><div class="bb"><span style="width:${rate}%;background:${color}"></span></div><div class="pc">${rate}%</div>`;
     wrap.appendChild(row);
   });
   if(t===0){
     wrap.innerHTML+='<div class="muted" style="font-size:13px;margin-top:8px">尚未做题，开始练习后这里会显示正确率。</div>';
+  }
+
+  // 各科错题数（复用 renderWrongBook 的合并逻辑：嵌入题库 + localStorage）
+  const wWrap=document.getElementById('st-wrong-by-cat');
+  wWrap.innerHTML='';
+  const wc = {};
+  CATEGORIES.forEach(c=>wc[c.key]=0);
+  EMBEDDED_QUESTIONS.forEach(q=>{
+    if(!q.id || !q.stem || !q.cat) return;
+    if(wc[q.cat]!=null) wc[q.cat]++;
+  });
+  Object.keys(store.wrong).forEach(id=>{
+    const w=store.wrong[id];
+    const q=QUESTIONS.find(q=>q.id===id);
+    const cat = q? q.category : (w.cat||'medicine');
+    if(wc[cat]!=null) wc[cat]++;
+  });
+  const wcTotal = CATEGORIES.reduce((s,c)=>s+wc[c.key],0);
+  const wcMax = Math.max(1, ...CATEGORIES.map(c=>wc[c.key]));
+  CATEGORIES.forEach(cat=>{
+    const cnt = wc[cat.key];
+    const pct = wcMax? Math.round(cnt/wcMax*100) : 0;
+    const row=document.createElement('div');
+    row.className='srow';
+    const color = catColor(cat.key);
+    row.innerHTML=`<div class="nm"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px;vertical-align:0;box-shadow:0 0 0 2px ${catSoft(cat.key)}"></span><span style="font-size:15px;margin-right:4px;vertical-align:-2px">${catEmoji(cat.key)}</span>${cat.label}</div><div class="bb"><span style="width:${pct}%;background:${color}"></span></div><div class="pc">${cnt} 题</div>`;
+    wWrap.appendChild(row);
+  });
+  if(!wcTotal){
+    wWrap.innerHTML+='<div class="muted" style="font-size:13px;margin-top:8px">还没有错题，录入或练习答错后会显示在这里。</div>';
+  } else {
+    wWrap.innerHTML+=`<div class="muted" style="font-size:12.5px;margin-top:8px;text-align:right">共 ${wcTotal} 题</div>`;
   }
 }
 
@@ -1423,4 +1833,6 @@ function escapeHtml(s){
 
 /* init */
 renderHome();
-</script></body></html>
+</script>
+</body>
+</html>
