@@ -483,6 +483,13 @@ body{
           <label>💭 内心OS <span class="muted" style="font-weight:normal">（只给自己看的提醒，做题时<strong>隐藏</strong>，出答案时<strong>显示</strong>）</span></label>
           <textarea class="textarea" id="mn-inner" placeholder="例：&#10;· 看到胸痛+ST抬高先想 STEMI，别被选项里的不稳定型心绞痛骗了&#10;· 老年人腹痛=先排查血管性，再想外科&#10;· 下次一定要先看心电图再下诊断" style="min-height:90px"></textarea>
         </div>
+        <div class="form-group" style="margin:-4px 0 12px;display:flex;align-items:flex-start;gap:9px;padding:10px 12px;background:#fff8ef;border-radius:8px;border:1px solid #f5e0c0">
+          <input type="checkbox" id="mn-private" style="margin:1px 0 0;width:16px;height:16px;accent-color:#ff9500;cursor:pointer;flex-shrink:0">
+          <label for="mn-private" style="cursor:pointer;font-weight:500;font-size:13.5px;color:#5a3e1b;line-height:1.45;margin:0">
+            🔒 <strong>仅本地保存</strong>
+            <span style="font-weight:normal;color:#8b6a3d;font-size:12.5px;display:block;margin-top:2px">勾选后：不上传到 GitHub、不跨设备同步。含患者照片 / 病历等敏感内容时务必勾选。</span>
+          </label>
+        </div>
         <div id="mn-img-status" class="muted" style="font-size:12.5px;margin:-4px 0 12px;display:none">
           🖼 已附带上方粘贴的截图，一起保存
         </div>
@@ -712,6 +719,27 @@ function saveEmbeddedShadow(){
   catch(e) { /* localStorage 可能被禁用，不致命 */ }
 }
 
+/* ============ 私密题库：仅本机，绝不上传 ============
+   用于存放含敏感内容（患者照片/病历）的错题。
+   只存在浏览器 localStorage 里，永不进 EMBEDDED_QUESTIONS，永不推 GitHub。*/
+const PRIVATE_SHADOW_KEY = 'amc_review_private_v1';
+let PRIVATE_QUESTIONS = [];
+function loadPrivateShadow(){
+  try { return JSON.parse(localStorage.getItem(PRIVATE_SHADOW_KEY)) || []; }
+  catch(e) { return []; }
+}
+function savePrivateShadow(){
+  try { localStorage.setItem(PRIVATE_SHADOW_KEY, JSON.stringify(PRIVATE_QUESTIONS)); }
+  catch(e) { /* localStorage 可能被禁用，不致命 */ }
+}
+function removePrivateQuestion(qId){
+  const idx = PRIVATE_QUESTIONS.findIndex(q => q.id === qId);
+  if(idx >= 0){
+    PRIVATE_QUESTIONS.splice(idx, 1);
+    savePrivateShadow();
+  }
+}
+
 // 启动时合并影子到运行时嵌入数组（按 id 去重）
 (function initEmbedded(){
   const shadow = loadEmbeddedShadow();
@@ -724,6 +752,9 @@ function saveEmbeddedShadow(){
   });
   saveEmbeddedShadow();
 })();
+
+// 启动时加载私密题库（仅本机，不上传）
+PRIVATE_QUESTIONS = loadPrivateShadow();
 
 /* ============ 持久化 ============ */
 const STORE_KEY='amc_review_v2';
@@ -1172,6 +1203,8 @@ function resetManualForm(){
   });
   const ans=document.getElementById('mn-answer');
   if(ans) ans.value='';
+  const priv=document.getElementById('mn-private');
+  if(priv) priv.checked=false;
   inputImageBase64='';
   const preview=document.getElementById('in-preview');
   if(preview){ preview.src=''; preview.style.display='none'; }
@@ -1202,6 +1235,7 @@ document.getElementById('mn-save').addEventListener('click', function(){
   const answer = document.getElementById('mn-answer').value;
   const summary = document.getElementById('mn-summary').value.trim();
   const innerNote = document.getElementById('mn-inner').value.trim();
+  const isPrivate = document.getElementById('mn-private').checked;
   const msg = document.getElementById('mn-msg');
 
   function showErr(h, sub){
@@ -1216,7 +1250,8 @@ document.getElementById('mn-save').addEventListener('click', function(){
   // 稳定 id：内容+图片一起算
   const contentKey = (stem||title||'') + '|' + JSON.stringify(opts) + '|' + answer + '|' + summary + '|' + (inputImageBase64 ? 'with-img' : 'no-img');
   const id = 'embed_' + simpleHash(contentKey);
-  if(EMBEDDED_QUESTIONS.find(q=>q.id===id)){
+  // 检查两个数组都看（私密题和公开题不重复）
+  if(EMBEDDED_QUESTIONS.find(q=>q.id===id) || PRIVATE_QUESTIONS.find(q=>q.id===id)){
     showErr('这道题已经在错题本里了');
     return;
   }
@@ -1232,13 +1267,19 @@ document.getElementById('mn-save').addEventListener('click', function(){
   if(innerNote) eq.innerNote = innerNote;
   if(inputImageBase64) eq.imageBase64 = inputImageBase64;
 
-  EMBEDDED_QUESTIONS.push(eq);
-  saveEmbeddedShadow();
-  renderEmbedSection();
-  maybeAutoPush();
+  // 私密题 → PRIVATE_QUESTIONS（仅本地）；公开题 → EMBEDDED_QUESTIONS（可推 GitHub）
+  if(isPrivate){
+    PRIVATE_QUESTIONS.push(eq);
+    savePrivateShadow();
+  } else {
+    EMBEDDED_QUESTIONS.push(eq);
+    saveEmbeddedShadow();
+    renderEmbedSection();
+    maybeAutoPush();
+  }
 
   msg.style.display='block';
-  msg.innerHTML=`<div class="feedback show ok"><div class="h">✓ 已保存到错题本</div>${ghAutoPush && ghConfig.token ? '正在自动推送到 GitHub…' : '如需永久保存，点下方 💾 下载新版 HTML'}<br><a href="#" style="color:var(--brand-dark);font-weight:600;font-size:13px" onclick="go('wrong');return false">去错题本查看 →</a></div>`;
+  msg.innerHTML=`<div class="feedback show ${isPrivate?'ok':'ok'}"><div class="h">✓ 已保存${isPrivate?'到私密题库':'到错题本'}</div>${isPrivate ? '<div>🔒 仅本机保存，<strong>未上传</strong>。换浏览器/清缓存会丢失。</div>' : (ghAutoPush && ghConfig.token ? '正在自动推送到 GitHub…' : '如需永久保存，点下方 💾 下载新版 HTML')}<br><a href="#" style="color:var(--brand-dark);font-weight:600;font-size:13px" onclick="go('wrong');return false">去错题本查看 →</a></div>`;
   resetManualForm();
 });
 
@@ -1587,7 +1628,7 @@ function renderWrongBook(){
     chips.appendChild(b);
   });
 
-  // 合并三种错题：练习错题 / 嵌入题库（永久）/ 手动录入
+  // 合并四种错题：练习错题 / 嵌入题库（永久）/ 私密题库（仅本机）/ 手动录入
   const ids=Object.keys(store.wrong);
   const items=[];
   // 先加入嵌入题库
@@ -1611,6 +1652,29 @@ function renderWrongBook(){
       answer: q.answer || null,
       title: q.title || null,
       type: 'embedded'
+    });
+  });
+  // 私密题库（仅本机，永不上传）
+  PRIVATE_QUESTIONS.forEach(q=>{
+    if(!q.id || !q.stem || !q.cat) return;
+    items.push({
+      id: q.id,
+      q: null,
+      w: {
+        wrongCount: 1,
+        lastAns: null,
+        marked: false,
+        summary: q.summary || '',
+        imageBase64: q.imageBase64 || null,
+        innerNote: q.innerNote || null,
+        source: 'private'
+      },
+      cat: q.cat,
+      stem: q.stem,
+      options: q.options || null,
+      answer: q.answer || null,
+      title: q.title || null,
+      type: 'private'
     });
   });
   // 再加入 localStorage 中的错题
@@ -1642,6 +1706,7 @@ function renderWrongBook(){
     item.className='card wb-item';
     let badge = '';
     if(type==='embedded') badge = ' · 📦 永久';
+    else if(type==='private') badge = ' · 🔒 私密';
     else if(type==='manual') badge = (w.source==='ai'?' · AI 录入':' · 手动录入');
     else if(w.marked) badge = ' · 已标记';
     const titleHtml = title ? `<div style="font-weight:700;color:var(--brand-dark);margin-bottom:4px;font-size:14px">📌 ${escapeHtml(title)}</div>` : '';
@@ -1686,10 +1751,14 @@ function renderWrongBook(){
       removeBtn.addEventListener('click', ()=>{
         const msg = type==='embedded'
           ? '从嵌入题库移除？删除后会自动推送到 GitHub。'
+          : type==='private'
+          ? '从本地私密题库移除？此操作不会推送到任何地方。'
           : '从错题本移除？';
         if(confirm(msg)){
           if(type==='embedded'){
             removeEmbeddedQuestion(id);
+          } else if(type==='private'){
+            removePrivateQuestion(id);
           } else {
             removeWrong(id);
           }
@@ -1713,6 +1782,13 @@ function renderWrongBook(){
             saveEmbeddedShadow();
             maybeAutoPush();
           }
+        } else if(type==='private'){
+          const pq = PRIVATE_QUESTIONS.find(q=>q.id===id);
+          if(pq){
+            if(trimmed) pq.innerNote = trimmed;
+            else delete pq.innerNote;
+            savePrivateShadow();  // 私密题只存本地，不推 GitHub
+          }
         } else {
           if(trimmed) store.wrong[id].innerNote = trimmed;
           else delete store.wrong[id].innerNote;
@@ -1726,8 +1802,12 @@ function renderWrongBook(){
 }
 document.getElementById('wb-redo').addEventListener('click', ()=>{
   const ids=Object.keys(store.wrong);
-  // 包含嵌入题库的题目
-  const allIds = new Set([...ids, ...EMBEDDED_QUESTIONS.map(q=>q.id).filter(Boolean)]);
+  // 包含嵌入题库 + 私密题库的题目
+  const allIds = new Set([
+    ...ids,
+    ...EMBEDDED_QUESTIONS.map(q=>q.id).filter(Boolean),
+    ...PRIVATE_QUESTIONS.map(q=>q.id).filter(Boolean)
+  ]);
   const pool=[];
   allIds.forEach(id=>{
     const q=QUESTIONS.find(q=>q.id===id);
@@ -1744,6 +1824,19 @@ document.getElementById('wb-redo').addEventListener('click', ()=>{
           explanation: (eq.title||'') + '\n' + (eq.summary||''),
           innerNote: eq.innerNote || null
         });
+      } else {
+        const pq = PRIVATE_QUESTIONS.find(q=>q.id===id);
+        if(pq){
+          pool.push({
+            id: pq.id,
+            category: pq.cat,
+            stem: pq.stem,
+            options: pq.options || {},
+            answer: pq.answer || '',
+            explanation: (pq.title||'') + '\n' + (pq.summary||''),
+            innerNote: pq.innerNote || null
+          });
+        }
       }
     }
   });
@@ -1773,7 +1866,7 @@ document.getElementById('lightbox').addEventListener('click', function(e){
 
 /* ============ 统计 ============ */
 function renderStats(){
-  const t=totalSeen(), c=totalCorrect(), w=Object.keys(store.wrong).length + EMBEDDED_QUESTIONS.length;
+  const t=totalSeen(), c=totalCorrect(), w=Object.keys(store.wrong).length + EMBEDDED_QUESTIONS.length + PRIVATE_QUESTIONS.length;
   document.getElementById('st-total').textContent=t;
   document.getElementById('st-correct').textContent=c;
   document.getElementById('st-wrong').textContent=w;
@@ -1792,12 +1885,16 @@ function renderStats(){
     wrap.innerHTML+='<div class="muted" style="font-size:13px;margin-top:8px">尚未做题，开始练习后这里会显示正确率。</div>';
   }
 
-  // 各科错题数（复用 renderWrongBook 的合并逻辑：嵌入题库 + localStorage）
+  // 各科错题数（复用 renderWrongBook 的合并逻辑：嵌入题库 + 私密题库 + localStorage）
   const wWrap=document.getElementById('st-wrong-by-cat');
   wWrap.innerHTML='';
   const wc = {};
   CATEGORIES.forEach(c=>wc[c.key]=0);
   EMBEDDED_QUESTIONS.forEach(q=>{
+    if(!q.id || !q.stem || !q.cat) return;
+    if(wc[q.cat]!=null) wc[q.cat]++;
+  });
+  PRIVATE_QUESTIONS.forEach(q=>{
     if(!q.id || !q.stem || !q.cat) return;
     if(wc[q.cat]!=null) wc[q.cat]++;
   });
