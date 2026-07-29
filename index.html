@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0d9488">
@@ -232,9 +231,9 @@ body{
       </div>
     </div>
     <div class="quick">
-      <a href="#" data-go="practice"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>练习</div><div class="d">按科目或随机做题</div></a>
-      <a href="#" data-go="input"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>录入</div><div class="d">JSON / 截图录入</div></a>
-      <a href="#" data-go="wrong"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>错题本</div><div class="d">复盘薄弱知识点</div></a>
+      <a href="#" data-go="practice"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>练习</div><div class="d">按科目或随机做题</div></a>
+      <a href="#" data-go="input"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>录入</div><div class="d">JSON / 截图录入</div></a>
+      <a href="#" data-go="wrong"><div class="t"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>错题本</div><div class="d">复盘薄弱知识点</div></a>
     </div>
     <div class="card">
       <div class="section-title">各科目进度</div>
@@ -269,7 +268,7 @@ body{
 
     <!-- 粘贴区域 -->
     <div class="paste-zone" id="paste-zone">
-      <div class="ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+      <div class="ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
       <div class="hint">点击此处或 Ctrl+V 粘贴错题截图</div>
       <div class="sub">截图留存到本地，后续发给我分析</div>
     </div>
@@ -280,7 +279,16 @@ body{
       <div class="section-title">AI 一键导入</div>
       <p class="muted">把 WorkBuddy 返回的 JSON 粘贴到下方，直接导入错题本</p>
       <div class="form-group" style="margin-top:12px">
-        <textarea class="textarea" id="ai-batch" placeholder='[&#10;  {&#10;    "cat": "paeds",&#10;    "title": "儿科-阴道出血",&#10;    "stem": "...",&#10;    "options": {"A":"...", "B":"..."},&#10;    "answer": "B",&#10;    "summary": "知识点...\n陷阱..."&#10;  }&#10;]' style="min-height:200px;font-family:monospace;font-size:12px"></textarea>
+        <textarea class="textarea" id="ai-batch" placeholder="[
+  {
+    &quot;cat&quot;: &quot;paeds&quot;,
+    &quot;title&quot;: &quot;儿科-阴道出血&quot;,
+    &quot;stem&quot;: &quot;...&quot;,
+    &quot;options&quot;: {&quot;A&quot;:&quot;...&quot;, &quot;B&quot;:&quot;...&quot;},
+    &quot;answer&quot;: &quot;B&quot;,
+    &quot;summary&quot;: &quot;知识点...\n陷阱...&quot;
+  }
+]" style="min-height:200px;font-family:monospace;font-size:12px"></textarea>
       </div>
       <div class="actions">
         <button class="btn btn-pri" id="ai-import">导入到错题本</button>
@@ -341,7 +349,7 @@ body{
 
       <div style="margin-top:14px">
         <div style="font-size:13px;font-weight:600;margin-bottom:6px">已嵌入 <span id="embed-count">0</span> 题</div>
-        <textarea class="textarea" id="embed-code" style="min-height:100px;font-family:monospace;font-size:12px" readonly placeholder="// 嵌入的题目会显示在这里（只读）"></textarea>
+        <textarea class="textarea" id="embed-code" style="min-height:100px;font-family:monospace;font-size:12px" readonly="" placeholder="// 嵌入的题目会显示在这里（只读）"></textarea>
       </div>
 
       <div class="actions" style="margin-top:10px;flex-wrap:wrap">
@@ -403,7 +411,7 @@ body{
         <li>Women's Health（产科与妇科）：15</li>
         <li>Child Health（儿科）：15</li>
         <li>Mental Health（精神科）：15</li>
-        <li>Population Health & Ethics：15</li>
+        <li>Population Health &amp; Ethics：15</li>
       </ul>
 
       <h2>使用方法</h2>
@@ -421,7 +429,7 @@ body{
 </div>
 
 <!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox"><span class="close" id="lb-close">&times;</span><img id="lb-img" src="" alt=""></div>
+<div class="lightbox" id="lightbox"><span class="close" id="lb-close">×</span><img id="lb-img" src="" alt=""></div>
 
 <script>
 /* ============ 题库数据 ============ */
@@ -463,8 +471,9 @@ const FILE_SOURCE = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
      imageBase64 - 选填，截图（base64 编码）
 */
 let EMBEDDED_QUESTIONS = [
-  // 示例（可删除）：
-  // {id:'embed_demo', cat:'medicine', title:'示例', stem:'题干', options:{A:'选项A',B:'选项B'}, answer:'A', summary:'要点总结'},
+  {"id":"embed_4ev3vq","cat":"paeds","stem":"一名4岁女童因阴道少量出血就诊。无发热，无腹痛，无外伤史。体格检查：外阴正常，无瘀斑，处女膜完整。肛查未及异常。腹部平软，无压痛。最可能的诊断是？","title":"儿科-女童阴道出血的鉴别诊断","options":{"A":"性早熟","B":"阴道异物","C":"尿道黏膜脱垂","D":"外阴炎","E":"性虐待"},"answer":"B","summary":"知识点：\n• 学龄前女童阴道出血，最常见原因为阴道异物（玩具小零件、纸巾等）\n• 体征：处女膜完整、外阴正常、无外伤瘀斑\n• 鉴别：性早熟（伴乳房发育等第二性征）、尿道黏膜脱垂（尿道口环形肿物）、性虐待（多有瘀斑或行为异常）\n\n陷阱：\n• 不要因家属否认就排除异物可能\n• 需追问玩耍史、是否有小物件丢失"},
+  {"id":"embed_dy8nxn","cat":"paeds","stem":"一名3岁男孩，家长发现其颈前中线处有一无痛性肿物，随吞咽上下移动。肿物质软，边界清楚，无压痛。最可能的诊断是？","title":"儿科-颈部中线肿物的鉴别","options":{"A":"鳃裂囊肿","B":"甲状腺舌管囊肿","C":"淋巴结炎","D":"皮样囊肿","E":"异位甲状腺"},"answer":"B","summary":"知识点：\n• 甲状腺舌管囊肿（Thyroglossal duct cyst）：颈前中线无痛性囊性肿物，随吞咽/伸舌上下移动\n• 为胚胎期甲状腺舌管未完全退化所致\n• 好发于1-10岁儿童\n• 鉴别：鳃裂囊肿（位于胸锁乳突肌前缘）、淋巴结炎（多发、有压痛、活动度差）、皮样囊肿（不随吞咽移动）、异位甲状腺（罕见，需超声+核素扫描排除）\n\n陷阱：\n• 术前必须超声确认正常位置甲状腺存在，避免切除异位甲状腺（唯一功能性甲状腺组织）"},
+  {"id":"embed_wc7rcz","cat":"paeds","stem":"一名8岁男孩，学校体检尿常规发现尿蛋白(++)。无水肿，血压正常，无肉眼血尿。复查晨尿：尿蛋白(-)。最可能的诊断是？","title":"儿科-儿童蛋白尿的评估与鉴别","options":{"A":"微小病变型肾病","B":"体位性（直立性）蛋白尿","C":"急性肾小球肾炎","D":"IgA肾病","E":"Alport综合征"},"answer":"B","summary":"知识点：\n• 体位性蛋白尿（Orthostatic proteinuria）：直立位时出现蛋白尿，卧位（晨尿）消失\n• 为青少年最常见良性蛋白尿原因\n• 24h尿蛋白定量通常<1g\n• 预后良好，无需特殊治疗\n• 鉴别要点：晨尿阴性、无水肿高血压、肾功能正常\n\n陷阱：\n• 关键检查：晨尿复查！不要看到尿蛋白就做肾活检\n• 需排除：肾病综合征（大量蛋白尿+低蛋白血症+水肿）、肾炎（血尿+高血压+肾功能异常）"}
 ];
 
 /* ============ 本地缓存：影子备份 ============
@@ -1414,6 +1423,4 @@ function escapeHtml(s){
 
 /* init */
 renderHome();
-</script>
-</body>
-</html>
+</script></body></html>
